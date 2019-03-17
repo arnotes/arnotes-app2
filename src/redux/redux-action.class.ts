@@ -9,7 +9,7 @@ export class ReduxAction<T> implements IReduxAction<T>{
         this.data = data;
     }
 
-    get():IReduxAction<T> {
+    get value ():IReduxAction<T> {
        return {
            type: this.type,
            data: this.data

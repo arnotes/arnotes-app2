@@ -7,6 +7,7 @@ import firebase from 'firebase';
 import { ActionTypes } from './redux/action-types';
 import firebaseSvc from './services/firebase.service';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import Login from './Login';
 
 interface AuthProtectorProps extends StoreState {
   dispatch?:(action:IReduxAction<any>)=>any
@@ -32,13 +33,13 @@ class AuthProtector extends Component<AuthProtectorProps, AuthProtectorState> {
   async checkAuth(){
     this.setState({...this.state,loading:true});
     firebaseSvc.auth().onAuthStateChanged(user => {
-      this.props.dispatch(new ReduxAction(ActionTypes.SET_USER, user).get());
+      this.props.dispatch(new ReduxAction(ActionTypes.SET_USER, user).value);
       this.setState({...this.state,loading:false});
     });
   }
 
   render() {
-    if (this.state.loading || true) {
+    if (this.state.loading) {
       return (
         <div className="giant-progress-container-wrapper">
           <div className="giant-progress-container">
@@ -53,8 +54,8 @@ class AuthProtector extends Component<AuthProtectorProps, AuthProtectorState> {
       );
     } else if (this.props.user == null) {
       return (
-        <div>
-          not logged in
+        <div className="flex-hbox login-wrapper">
+          <Login></Login>
 				</div>
       );
     } else {
