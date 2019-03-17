@@ -1,26 +1,30 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
-import './App.css';
+import './App.scss';
+import '@material-ui/core'
+import firebase from 'firebase';
+import { Button, CssBaseline } from '@material-ui/core';
+import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
+import AuthProtector from './AuthProtector';
+
+const theme = createMuiTheme({
+  palette:{
+    type: "dark"
+  }
+});
 
 class App extends Component {
+  constructor(props){
+    super(props);
+
+  }
+
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.tsx</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
+      <MuiThemeProvider theme={theme}>
+          <CssBaseline/>
+          <AuthProtector></AuthProtector>
+      </MuiThemeProvider>
     );
   }
 }

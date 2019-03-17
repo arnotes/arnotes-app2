@@ -1,0 +1,21 @@
+body{
+    height: 100vh;
+}
+
+.flex-hbox{
+    display: flex;
+    flex-direction: column;
+}
+.flex-item{
+    flex: 1;
+}
+
+.giant-progress-container-wrapper{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    .giant-progress-container{
+        text-align: center;
+    }    
+}
