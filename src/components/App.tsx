@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
-import './App.scss';
+import '../App.scss';
 import '@material-ui/core'
 import firebase from 'firebase';
 import { Button, CssBaseline } from '@material-ui/core';

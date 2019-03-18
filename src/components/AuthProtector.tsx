@@ -1,13 +1,14 @@
 import React, { Component, Dispatch } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { StoreState } from './redux/store-state';
-import { ReduxAction, IReduxAction } from './redux/redux-action.class';
+import { StoreState } from '../redux/store-state';
+import { ReduxAction, IReduxAction } from '../redux/redux-action.class';
 import firebase from 'firebase';
-import { ActionTypes } from './redux/action-types';
-import firebaseSvc from './services/firebase.service';
+import { ActionTypes } from '../redux/action-types';
+import firebaseSvc from '../services/firebase.service';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Login from './Login';
+import Layout from './Layout';
 
 interface AuthProtectorProps extends StoreState {
   dispatch?:(action:IReduxAction<any>)=>any
@@ -60,9 +61,7 @@ class AuthProtector extends Component<AuthProtectorProps, AuthProtectorState> {
       );
     } else {
       return (
-        <div>
-          {JSON.stringify(this.props.user)}
-        </div>
+        <Layout></Layout>
       );
     }
   }

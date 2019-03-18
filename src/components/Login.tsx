@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { StoreState } from './redux/store-state';
+import { StoreState } from '../redux/store-state';
 import { Dispatch } from 'redux';
 import { Card, CardHeader, CardContent, Typography, Button, Dialog, DialogTitle, DialogContent, DialogContentText, List, ListItem, ListItemText, ListItemIcon, Icon, Tooltip } from '@material-ui/core';
-import { IReduxAction } from './redux/redux-action.class';
+import { IReduxAction } from '../redux/redux-action.class';
 import withMobileDialog from '@material-ui/core/withMobileDialog';
-import authSvc from './services/auth.service';
+import authSvc from '../services/auth.service';
 
 interface LoginProps extends StoreState{
     dispatch?:<T>(action:IReduxAction<T>)=>void,
