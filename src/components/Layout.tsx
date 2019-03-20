@@ -5,10 +5,11 @@ import { Toolbar, IconButton, Typography, Button, AppBar, Hidden, withWidth, Dra
 import { Dispatch } from 'redux';
 import { StoreState } from '../redux/store-state';
 import { IReduxAction } from '../redux/redux-action.class';
+import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
 
 interface LayoutProps extends StoreState{
   dispatch?:<T>(action:IReduxAction<T>)=>any,
-  width?:number
+  width?:Breakpoint
 }
 
 interface LayoutState {
@@ -19,71 +20,49 @@ class Layout extends Component<LayoutProps, LayoutState> {
   constructor(props){
     super(props);
     this.state = {
-      drawerOpen:true
+      drawerOpen:false
     }
   }
 
-  onDrawerClose = (e)=>{
-    this.setState({...this,drawerOpen:false});
+  toggleDrawer = (isOpen:boolean = null)=>{
+    if(isOpen==null){
+      isOpen = !this.state.drawerOpen;
+    }
+
+    this.setState({...this.state,drawerOpen:isOpen});
+  }
+
+  isMobile(){
+    return this.props.width=="xs" || this.props.width=="sm";
   }
 
   render() {
     return (
-      <div className="layout-component">
+      <div className={`layout-component ${(this.state.drawerOpen || !this.isMobile()) && "drawer-open"}`}>
+        <nav>
+          <Drawer anchor="left" variant={this.isMobile()? "temporary":"permanent"} onClose={()=>this.toggleDrawer(false)} open={this.state.drawerOpen} classes={({paper:"drawer-paper"})} >
+            aw aw aw aw aw aw 
+            <br/>
+            aw aw aw aw aw aw 
+            <br/>
+            aw aw aw aw aw aw 
+          </Drawer>
+        </nav>      
         <AppBar color="primary" position="relative">
           <Toolbar>
-            <IconButton>
-              <i className="fas fa-bars"></i>
-            </IconButton>   
+            <Hidden only={["md","lg","xl"]} >
+              <IconButton onClick={()=>this.toggleDrawer()} >
+                <i className="fas fa-bars"></i>
+              </IconButton>   
+            </Hidden>
             <Typography variant="h6" color="inherit">
               Photos  {this.props.width}
             </Typography>
           </Toolbar>
         </AppBar>
-        
-        <Hidden only={["md","lg","xl"]}>
-          {/* MINI LIST OF NOTES */}
-          <Drawer anchor="left"
-            open={this.state.drawerOpen}
-            onClose={this.onDrawerClose}
-            variant="temporary" >
-            <div className="minilist-wrapper">
-              asdf
-              asdf
-              asdf
-              asdf
-            </div>
-          </Drawer>
-        </Hidden>        
-        
-        <div className="biglist-and-editor-wrapper">
-          <Grid container spacing={8}>
-            <Grid item md={5} lg={3} xl={3}>
-              <Hidden only={["xs","sm"]}>
-                {/* BIG LIST OF NOTES */}
-                <div className="biglist-wrapper">
-                  <p>ggg</p>
-                  <p>asdf</p>
-                  <p>asdf</p>
-                  <p>asdf</p>
-                  <p>asdf</p>
-                  <p>asdf</p>
-                  <p>asdf</p>
-                  <p>asdf</p>
-                  <p>asdf</p>
-                  <p>asdf</p>                
-                </div>
-              </Hidden>
-            </Grid>
-
-            <Grid item xs={12} sm={12} md={7} lg={9} xl={9} >
-              <div className="editor-wrapper">
-                editor here
-              </div>
-            </Grid>
-          </Grid>
+        <div className="layout-content">
+          insert content here
         </div>
-
       </div>
     )
   }

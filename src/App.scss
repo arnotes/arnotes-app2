@@ -1,5 +1,14 @@
+@import './App.medium-up.scss';
+
 body{
     height: 100vh;
+    div.layout-component{
+        header{
+            transition: margin-left 225ms cubic-bezier(0, 0, 0.2, 1) 0ms, width 225ms cubic-bezier(0, 0, 0.2, 1) 0ms;
+            width: 100%
+        }
+        
+    }
 }
 
 .flex-hbox{
@@ -18,4 +27,9 @@ body{
     .giant-progress-container{
         text-align: center;
     }    
+}
+
+
+div.drawer-paper{
+    width: 320px;
 }
