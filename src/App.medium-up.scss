@@ -1,7 +1,7 @@
 @media (min-width: 768px) { 
   body{
       div.layout-component.drawer-open{
-          header{
+          header,.layout-content{
               margin-left: 320px;
               width: calc(100% - 320px);
           }        

@@ -13,7 +13,11 @@ const theme = createMuiTheme({
   }
 });
 
-class App extends Component {
+interface AppProps{
+
+}
+
+class App extends Component<AppProps> {
   constructor(props){
     super(props);
 

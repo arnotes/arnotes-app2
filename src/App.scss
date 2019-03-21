@@ -3,9 +3,15 @@
 body{
     height: 100vh;
     div.layout-component{
-        header{
+        header, .layout-content{
             transition: margin-left 225ms cubic-bezier(0, 0, 0.2, 1) 0ms, width 225ms cubic-bezier(0, 0, 0.2, 1) 0ms;
             width: 100%
+        }
+        header{
+            .btn-logout{
+                position: absolute;
+                right: 5px;
+            }
         }
         
     }
@@ -32,4 +38,22 @@ body{
 
 div.drawer-paper{
     width: 320px;
+}
+
+.note-list-component{
+    .search-input-wrapper{
+        display: flex;
+        padding-right: 10px;
+        padding-left: 10px;
+        .search-input{
+            flex: 1;
+        }
+        .search-icon{
+            height: unset;
+            margin-right: 8px;
+        }
+    }
+    .search-progress-complete{
+        visibility: hidden;
+    }
 }

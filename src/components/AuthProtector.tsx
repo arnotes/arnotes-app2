@@ -9,6 +9,8 @@ import firebaseSvc from '../services/firebase.service';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Login from './Login';
 import Layout from './Layout';
+import { databaseSvc } from '../services/database.service';
+import { INote } from '../models/note.interface';
 
 interface AuthProtectorProps extends StoreState {
   dispatch?:(action:IReduxAction<any>)=>any
@@ -36,8 +38,17 @@ class AuthProtector extends Component<AuthProtectorProps, AuthProtectorState> {
     firebaseSvc.auth().onAuthStateChanged(user => {
       this.props.dispatch(new ReduxAction(ActionTypes.SET_USER, user).value);
       this.setState({...this.state,loading:false});
+      if(user){
+        this.loadNotes();
+      }      
     });
   }
+
+  async loadNotes(){
+    const notes = await databaseSvc.getCollection<INote>("notes", (qry)=>qry.where("UID","==",this.props.user.uid));
+    this.props.dispatch(new ReduxAction(ActionTypes.SET_NOTE_LIST, notes).value);
+    this.props.dispatch(new ReduxAction(ActionTypes.SET_FILTERED_NOTE_LIST, [...notes]).value);
+  }  
 
   render() {
     if (this.state.loading) {

@@ -13,6 +13,10 @@ class AuthService{
         return this.auth.signInWithRedirect(this.googleAuthProvider);
     }
 
+    logOut(){
+        return this.auth.signOut();
+    }
+
     googleAuthProvider:firebase.auth.GoogleAuthProvider = null;
 }
 
