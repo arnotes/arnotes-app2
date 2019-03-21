@@ -5,7 +5,7 @@ import { StoreState } from '../redux/store-state';
 import { IReduxAction, ReduxAction } from '../redux/redux-action.class';
 import { databaseSvc } from '../services/database.service';
 import { INote } from '../models/note.interface';
-import { Paper, InputBase, Icon, LinearProgress, List, ListItem, ListItemText, ButtonBase, Button } from '@material-ui/core';
+import { Paper, InputBase, Icon, LinearProgress, List, ListItem, ListItemText, ButtonBase, Button, Divider } from '@material-ui/core';
 import color from '@material-ui/core/colors/lime';
 import { ActionTypes } from '../redux/action-types';
 import { Subject } from 'rxjs';
@@ -66,9 +66,9 @@ class NoteList extends Component<Props,State> {
     this.sbjSearch.next({});
   }
 
-  renderListItem(note:INote){
+  renderListItem(note:INote, index:number){
     return(
-      <ListItem button dense 
+      <ListItem button dense divider
         classes={({root:this.props.selectedNote == note? 'list-item-note-selected':'list-item-note'})}
         onClick={e=>this.props.onSelectNote && this.props.onSelectNote(note)} >
         <ListItemText>{note.Title}</ListItemText>
@@ -102,7 +102,7 @@ class NoteList extends Component<Props,State> {
         </LinearProgress>
         <div className="list-of-notes">
           <List>
-            {(filteredNotes||[]).map(n => this.renderListItem(n))}
+            {(filteredNotes||[]).map((n,index) => this.renderListItem(n,index))}
           </List>
         </div>     
       </div>

@@ -10,6 +10,7 @@ import authSvc from '../services/auth.service';
 import { ActionTypes } from '../redux/action-types';
 import NoteList from './NoteList';
 import { INote } from '../models/note.interface';
+import NoteEditor from './NoteEditor';
 
 interface LayoutProps extends StoreState{
   dispatch?:<T>(action:IReduxAction<T>)=>any,
@@ -75,9 +76,7 @@ class Layout extends Component<LayoutProps, LayoutState> {
           </Toolbar>
         </AppBar>
         <div className="layout-content">
-          insert content here
-          <br/>
-          {this.props.width}
+          <NoteEditor></NoteEditor>
         </div>
       </div>
     )
