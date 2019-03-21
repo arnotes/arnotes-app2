@@ -5,7 +5,7 @@ import { StoreState } from '../redux/store-state';
 import { IReduxAction, ReduxAction } from '../redux/redux-action.class';
 import { databaseSvc } from '../services/database.service';
 import { INote } from '../models/note.interface';
-import { Paper, InputBase, Icon, LinearProgress } from '@material-ui/core';
+import { Paper, InputBase, Icon, LinearProgress, List, ListItem, ListItemText, ButtonBase, Button } from '@material-ui/core';
 import color from '@material-ui/core/colors/lime';
 import { ActionTypes } from '../redux/action-types';
 import { Subject } from 'rxjs';
@@ -14,6 +14,7 @@ import { debounceTime } from 'rxjs/operators';
 interface Props extends StoreState{
   notes?:INote[];
   dispatch?:Dispatch<IReduxAction<any>>;
+  onSelectNote?:(note:INote)=>any
 }
 
 interface State{
@@ -47,8 +48,14 @@ class NoteList extends Component<Props,State> {
   // }
 
   filterNotes(){
+    const selectedNoteID = this.props && this.props.selectedNote && this.props.selectedNote.ID || "";
     const searchToLower = (this.props.strSearch||"").toLowerCase();
-    const filtered = this.props.notes.filter(n => n.Body.toLowerCase().includes(searchToLower) || n.Title.toLocaleLowerCase().includes(searchToLower));
+    const filtered = this.props.notes
+                          .filter(n => 
+                                    n.Body.toLowerCase().includes(searchToLower) ||
+                                    n.Title.toLocaleLowerCase().includes(searchToLower) ||
+                                    n.ID == selectedNoteID
+                                  );
     this.props.dispatch(new ReduxAction(ActionTypes.SET_FILTERED_NOTE_LIST, filtered).value);
     this.setState({...this.state,loading:false});
   }
@@ -59,11 +66,19 @@ class NoteList extends Component<Props,State> {
     this.sbjSearch.next({});
   }
 
+  renderListItem(note:INote){
+    return(
+      <ListItem button dense 
+        classes={({root:this.props.selectedNote == note? 'list-item-note-selected':'list-item-note'})}
+        onClick={e=>this.props.onSelectNote && this.props.onSelectNote(note)} >
+        <ListItemText>{note.Title}</ListItemText>
+      </ListItem>
+    );
+  }
+
   render() {
     const { loading } = this.state;
     const filteredNotes = this.props.filteredNotes||[];
-
-    console.log(this.props);
 
     return (
       <div className="note-list-component">
@@ -86,7 +101,9 @@ class NoteList extends Component<Props,State> {
           color="secondary">
         </LinearProgress>
         <div className="list-of-notes">
-          {(filteredNotes||[]).map(n => (<p>{n.Title}</p>))}
+          <List>
+            {(filteredNotes||[]).map(n => this.renderListItem(n))}
+          </List>
         </div>     
       </div>
     )

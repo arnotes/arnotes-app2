@@ -29,15 +29,22 @@ function notes(notes:INote[], action:IReduxAction<INote[]>){
 }
 
 function filteredNotes(notes:INote[], action:IReduxAction<INote[]>){
+  let returnVal:INote[] = [];
   switch (action.type) {
     case ActionTypes.SET_FILTERED_NOTE_LIST:
-      return [...action.data];
+      if(action.data){
+        returnVal = [...action.data];
+      }
       break;
   
     default:
-      return notes||[];
+      if(notes){
+        returnVal = [...notes];
+      }
       break;
   }
+
+  return returnVal.sort((a,b)=>a.Title.toLowerCase().localeCompare(b.Title.toLowerCase()));
 }
 
 function strSearch(str:string, action:IReduxAction<string>){
@@ -52,9 +59,22 @@ function strSearch(str:string, action:IReduxAction<string>){
   }
 }
 
+function selectedNote(note:INote, action:IReduxAction<INote>){
+  switch (action.type) {
+    case ActionTypes.SET_SELECTED_NOTE:
+      return action.data;
+      break;
+  
+    default:
+      return note||null;
+      break;
+  }
+}
+
 export const combinedReducers = combineReducers({
   user,
   notes:notes,
   strSearch:strSearch,
-  filteredNotes:filteredNotes
+  filteredNotes:filteredNotes,
+  selectedNote:selectedNote
 });

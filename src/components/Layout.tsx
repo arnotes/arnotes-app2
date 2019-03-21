@@ -9,6 +9,7 @@ import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
 import authSvc from '../services/auth.service';
 import { ActionTypes } from '../redux/action-types';
 import NoteList from './NoteList';
+import { INote } from '../models/note.interface';
 
 interface LayoutProps extends StoreState{
   dispatch?:<T>(action:IReduxAction<T>)=>any,
@@ -44,12 +45,16 @@ class Layout extends Component<LayoutProps, LayoutState> {
     this.props.dispatch(new ReduxAction(ActionTypes.SET_USER, null).value);
   }
 
+  onSelectNote = (note:INote)=>{
+    this.props.dispatch(new ReduxAction(ActionTypes.SET_SELECTED_NOTE, note).value);
+  }
+
   render() {
     return (
       <div className={`layout-component ${(this.state.drawerOpen || !this.isMobile()) && "drawer-open"}`}>
         <nav>
           <Drawer anchor="left" variant={this.isMobile()? "temporary":"permanent"} onClose={()=>this.toggleDrawer(false)} open={this.state.drawerOpen} classes={({paper:"drawer-paper"})} >
-            <NoteList></NoteList>
+            <NoteList onSelectNote={this.onSelectNote} ></NoteList>
           </Drawer>
         </nav>      
         <AppBar color="primary" position="relative">

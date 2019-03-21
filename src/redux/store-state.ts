@@ -6,4 +6,5 @@ export interface StoreState {
     notes?: INote[];
     filteredNotes?: INote[]
     strSearch?: string;
+    selectedNote?: INote;
 }
