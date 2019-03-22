@@ -117,7 +117,7 @@ class NoteList extends Component<Props,State> {
           </div>
         </Paper>
         <LinearProgress classes={({root:loading?"search-progress-loading":"search-progress-complete"})} 
-          color="secondary">
+          color="primary">
         </LinearProgress>
         <div className="list-of-notes">
           <List>
