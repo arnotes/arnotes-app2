@@ -47,7 +47,6 @@ class AuthProtector extends Component<AuthProtectorProps, AuthProtectorState> {
   async loadNotes(){
     const notes = await databaseSvc.getCollection<INote>("notes", (qry)=>qry.where("UID","==",this.props.user.uid));
     this.props.dispatch(new ReduxAction(ActionTypes.SET_NOTE_LIST, notes).value);
-    this.props.dispatch(new ReduxAction(ActionTypes.SET_FILTERED_NOTE_LIST, [...notes]).value);
   }  
 
   render() {

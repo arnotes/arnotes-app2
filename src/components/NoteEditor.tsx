@@ -3,46 +3,51 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import ReactQuill from 'react-quill';
 import { StoreState } from '../redux/store-state';
-import { Paper } from '@material-ui/core';
+import { Paper, TextField, Typography, Button, IconButton } from '@material-ui/core';
 import { Subject } from 'rxjs';
+import { IReduxAction, ReduxAction } from '../redux/redux-action.class';
+import { ActionTypes } from '../redux/action-types';
 
 interface Props extends StoreState{
-
+  dispatch?:<T>(action:IReduxAction<T>)=>any;
 }
 
 interface State{
-  dispatch?:Dispatch<any>;
+  
 }
 
 class NoteEditor extends Component<Props, State> {
 
   sbjChange = new Subject();
 
+  onCloseNote = ()=>{
+    this.props.dispatch(new ReduxAction(ActionTypes.SET_SELECTED_NOTE, null).value);
+  }
+
   render() {
     const { selectedNote } = this.props;
     return (
       <div className="note-editor-component">
         <Paper square>
-          <br/>
-          &nbsp;&nbsp; here here
-          <br/>
-          &nbsp;&nbsp; here here
-          <br/>
+          <div className="title-wraper">
+            <TextField margin="none"  classes={({root:'txt-title'})} disabled={!selectedNote} label="Title" value={selectedNote? selectedNote.Title:''}></TextField>
+            <IconButton disabled={!selectedNote} onClick={this.onCloseNote} color="default">
+              <i style={({fontSize:'20px'})} className="far fa-times-circle"></i>
+            </IconButton>
+          </div>
         </Paper>
         <Paper classes={({root:"quill-paper-wrapper"})} square >
-          <ReactQuill value={selectedNote? selectedNote.Body:''} placeholder="write your notes :)" theme="snow"></ReactQuill>
+          <ReactQuill readOnly={!selectedNote} value={selectedNote? selectedNote.Body:''} placeholder="write your notes :)" theme="snow"></ReactQuill>
         </Paper>
       </div>
     )
   }
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
   ...state
 })
 
-const mapDispatchToProps = (dispatch: any) => {
-  dispatch:dispatch
-}
+const mapDispatchToProps = (dispatch: any) => ({dispatch})
 
 export default connect(mapStateToProps, mapDispatchToProps)(NoteEditor)

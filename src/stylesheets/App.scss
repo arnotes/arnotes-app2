@@ -1,8 +1,9 @@
 @import './App.medium-up.scss';
 
-$primary-color: #3F51B5;
-$secondary-color: #ff3d00;
-$secondary-color-dark: #b22a00;
+$primary-color: #673ab7;
+$secondary-color: #00e5ff;//#eeff41;
+$secondary-text-color: rgba(0, 0, 0, 0.87);
+$semi-black: #4c4646;
 
 body{
     height: 100vh;
@@ -65,22 +66,38 @@ div.drawer-paper{
     }
     .list-of-notes{
         .list-item-note-selected{
-            background-color: $primary-color;
+            background-color: $secondary-color;
+            & .note-item-text-selected > span{
+                color: $secondary-text-color;
+                font-weight: 500;
+            }
         }
     }
 }
 
 .note-editor-component{
-    //padding: 10px;
-    // .quill-paper-wrapper{
-    //     border-radius: 0px;
-    // }
+    .actions-wrapper{
+        display: flex;
+        flex-direction: row-reverse;
+    }
+    .title-wraper{
+        display: flex;
+        padding: 10px;
+        .txt-title{
+            flex:1;
+        }
+    }
+    .quill-paper-wrapper{
+        margin-top: 10px;
+    }
     .quill{
         border-color: transparent;
         .ql-snow{
             &.ql-toolbar{
-                background-color: white;
-                
+                background-color: $secondary-color;
+                .ql-picker-options{
+                    background-color: $secondary-color;
+                }
             }
             &.ql-container{
                 border-color: transparent;
@@ -94,4 +111,12 @@ div.drawer-paper{
             }
         }
     }
+}
+
+
+.ql-snow .ql-picker.ql-expanded .ql-picker-label .ql-stroke {
+    stroke: $semi-black !important;
+}
+.ql-snow .ql-picker.ql-expanded .ql-picker-label {
+    color: $semi-black !important;
 }

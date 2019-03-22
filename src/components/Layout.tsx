@@ -48,6 +48,7 @@ class Layout extends Component<LayoutProps, LayoutState> {
 
   onSelectNote = (note:INote)=>{
     this.props.dispatch(new ReduxAction(ActionTypes.SET_SELECTED_NOTE, note).value);
+    this.toggleDrawer(false);
   }
 
   render() {
@@ -70,7 +71,7 @@ class Layout extends Component<LayoutProps, LayoutState> {
             </Typography>
             <Tooltip title="Sign Out" placement="left" >
               <IconButton onClick={this.logout} classes={({root:"btn-logout"})} >
-                <i className="fas fa-power-off"></i>
+                <i style={({fontSize:"20px"})} className="fas fa-power-off"></i>
               </IconButton>
             </Tooltip>            
           </Toolbar>

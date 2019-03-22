@@ -19,12 +19,15 @@ interface Props extends StoreState{
 
 interface State{
   loading?:boolean;
+  strSearch?:string;
 }
 
 class NoteList extends Component<Props,State> {
   constructor(p){
     super(p);
-    this.state = {};
+    this.state = {
+      strSearch:null
+    };
   }
 
   sbjSearch = new Subject();
@@ -32,65 +35,62 @@ class NoteList extends Component<Props,State> {
   componentDidMount(){
     this.sbjSearch
       .pipe(debounceTime(500))
-      .subscribe(()=>this.filterNotes());
+      .subscribe(()=>{
+        this.setState({...this.state,loading:false});
+        this.props.dispatch(new ReduxAction(ActionTypes.SET_SEARCH_QUERY, this.state.strSearch).value);
+      });
   }
 
-  componentWillReceiveProps(a,b){
-    
-  }
-
-  // async loadNotes(){
-  //   this.setState({...this.state,loading:true});
-  //   const notes = await databaseSvc.getCollection<INote>("notes", (qry)=>qry.where("UID","==",this.props.user.uid));
-  //   this.props.dispatch(new ReduxAction(ActionTypes.SET_NOTE_LIST, notes).value);
-  //   this.setState({...this.state,loading:false});
-  //   this.filterNotes();
-  // }
-
-  filterNotes(){
+  getFilterNotes(){
     const selectedNoteID = this.props && this.props.selectedNote && this.props.selectedNote.ID || "";
     const searchToLower = (this.props.strSearch||"").toLowerCase();
-    const filtered = this.props.notes
+    const filtered = (this.props.notes||[])
                           .filter(n => 
                                     n.Body.toLowerCase().includes(searchToLower) ||
                                     n.Title.toLocaleLowerCase().includes(searchToLower) ||
                                     n.ID == selectedNoteID
                                   );
-    this.props.dispatch(new ReduxAction(ActionTypes.SET_FILTERED_NOTE_LIST, filtered).value);
-    this.setState({...this.state,loading:false});
+    return filtered;
   }
 
   onSearchChange = (e:React.ChangeEvent<HTMLInputElement>)=>{
-    this.props.dispatch(new ReduxAction(ActionTypes.SET_SEARCH_QUERY,e.target.value).value);
-    this.setState({...this.state,loading:true});
+    this.setState({...this.state,loading:true,strSearch:e.target.value});
     this.sbjSearch.next({});
   }
 
+  onClickNote = (note:INote)=>{
+    this.props.onSelectNote && this.props.onSelectNote(note);
+  }
+
   renderListItem(note:INote, index:number){
+    const selected = this.props.selectedNote == note;
     return(
-      <ListItem button dense divider
-        classes={({root:this.props.selectedNote == note? 'list-item-note-selected':'list-item-note'})}
-        onClick={e=>this.props.onSelectNote && this.props.onSelectNote(note)} >
-        <ListItemText>{note.Title}</ListItemText>
+      <ListItem button dense divider key={note.ID}
+        classes={({root:selected? 'list-item-note-selected':'list-item-note'})}
+        onClick={e=>this.onClickNote(note)} >
+        <ListItemText classes={({root:'note-item-text '+(selected&&'note-item-text-selected')})} >{note.Title}</ListItemText>
       </ListItem>
     );
   }
 
   render() {
     const { loading } = this.state;
-    const filteredNotes = this.props.filteredNotes||[];
+    const filteredNotes = this.getFilterNotes();
+    let strSearch = this.state.strSearch;
+
+    if(strSearch==null){
+      strSearch = this.props.strSearch || "";
+    }
 
     return (
       <div className="note-list-component">
         <div className="actions-bar-wrapper">
-          aw aw aw
           <br/>
-          aw aw aw
         </div>
         <Paper classes={({root:"searchbar-paper"})} >
           <div className="search-input-wrapper">
             <InputBase onChange={this.onSearchChange}
-              value={this.props.strSearch} 
+              value={strSearch} 
               classes={({root:"search-input"})} placeholder="Search.."></InputBase>
             <Icon fontSize="small" classes={({root:'search-icon'})}>
               <i style={({color:"#a0a0a0"})} className="fas fa-search"></i>

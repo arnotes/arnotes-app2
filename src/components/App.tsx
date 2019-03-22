@@ -11,11 +11,12 @@ import AuthProtector from './AuthProtector';
 
 const theme = createMuiTheme({
   palette:{
-    type: "dark",
+    type: 'dark',
+    primary:{
+      main:'#673ab7'
+    },
     secondary: {
-      dark: '#b22a00',
-      main: '#ff3d00',
-      light: '#ff6333'
+      main: '#00e5ff',
     }
   }
 });
