@@ -64,7 +64,7 @@ class NoteList extends Component<Props,State> {
   }
 
   onClickAddNote = async ()=>{
-    const dummyTitle = 'NEW_NOTE'+(new Date().getTime().toString());
+    const dummyTitle = 'NEW_NOTE_'+(new Date().getTime().toString());
     let newNote:INote = {
       Body:'',
       Title:dummyTitle,

@@ -5,6 +5,10 @@ $secondary-color: #00e5ff;//#eeff41;
 $secondary-text-color: rgba(0, 0, 0, 0.87);
 $semi-black: #4c4646;
 
+.hidden{
+    display: none !important;
+}
+
 body{
     height: 100vh;
     div.layout-component{
@@ -92,6 +96,11 @@ div.drawer-paper{
     }
     .quill-paper-wrapper{
         margin-top: 10px;
+        .delete-btn{
+            transform: translate3d(0px, -51px, 0px);
+            right: 20px;
+            position: absolute;
+        }
     }
     .quill{
         border-color: transparent;
