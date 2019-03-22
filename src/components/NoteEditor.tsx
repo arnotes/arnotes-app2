@@ -30,9 +30,9 @@ class NoteEditor extends Component<Props, State> {
       <div className="note-editor-component">
         <Paper square>
           <div className="title-wraper">
-            <TextField margin="none"  classes={({root:'txt-title'})} disabled={!selectedNote} label="Title" value={selectedNote? selectedNote.Title:''}></TextField>
+            <TextField id="txt-note-title" classes={({root:'txt-title'})} disabled={!selectedNote} label="Title" value={selectedNote? selectedNote.Title:''}></TextField>
             <IconButton disabled={!selectedNote} onClick={this.onCloseNote} color="default">
-              <i style={({fontSize:'20px'})} className="far fa-times-circle"></i>
+              <i style={({fontSize:'20px'})} className="fas fa-times-circle"></i>
             </IconButton>
           </div>
         </Paper>

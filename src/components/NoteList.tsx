@@ -5,7 +5,7 @@ import { StoreState } from '../redux/store-state';
 import { IReduxAction, ReduxAction } from '../redux/redux-action.class';
 import { databaseSvc } from '../services/database.service';
 import { INote } from '../models/note.interface';
-import { Paper, InputBase, Icon, LinearProgress, List, ListItem, ListItemText, ButtonBase, Button, Divider } from '@material-ui/core';
+import { Paper, InputBase, Icon, LinearProgress, List, ListItem, ListItemText, ButtonBase, Button, Divider, ListItemIcon } from '@material-ui/core';
 import color from '@material-ui/core/colors/lime';
 import { ActionTypes } from '../redux/action-types';
 import { Subject } from 'rxjs';
@@ -15,6 +15,7 @@ interface Props extends StoreState{
   notes?:INote[];
   dispatch?:Dispatch<IReduxAction<any>>;
   onSelectNote?:(note:INote)=>any
+  onAddNote?:(note:INote)=>any
 }
 
 interface State{
@@ -62,6 +63,24 @@ class NoteList extends Component<Props,State> {
     this.props.onSelectNote && this.props.onSelectNote(note);
   }
 
+  onClickAddNote = async ()=>{
+    const dummyTitle = 'NEW_NOTE'+(new Date().getTime().toString());
+    let newNote:INote = {
+      Body:'',
+      Title:dummyTitle,
+      UID:this.props.user.uid
+    }
+    await databaseSvc.addToCollection('notes',newNote);
+    const newNoteList = [...this.props.notes, newNote];
+    this.props.dispatch(new ReduxAction(ActionTypes.SET_NOTE_LIST,newNoteList).value);
+    this.props.dispatch(new ReduxAction(ActionTypes.SET_SELECTED_NOTE, newNote).value);
+    setTimeout(() => {
+      const titleInput = document.querySelector('#txt-note-title') as HTMLInputElement;
+      titleInput.focus();
+      titleInput.select();
+    }, 100);
+  }
+
   renderListItem(note:INote, index:number){
     const selected = this.props.selectedNote == note;
     return(
@@ -102,7 +121,13 @@ class NoteList extends Component<Props,State> {
         </LinearProgress>
         <div className="list-of-notes">
           <List>
-            {(filteredNotes||[]).map((n,index) => this.renderListItem(n,index))}
+            <ListItem onClick={this.onClickAddNote} classes={({root:'add-note-btn'})} button dense divider>
+              <ListItemText classes={({root:'note-item-text'})} >ADD NOTE</ListItemText>
+              <ListItemIcon>
+                <i className="fas fa-plus-circle"></i>
+              </ListItemIcon>              
+            </ListItem>
+            {filteredNotes.map((n,index) => this.renderListItem(n,index))}
           </List>
         </div>     
       </div>

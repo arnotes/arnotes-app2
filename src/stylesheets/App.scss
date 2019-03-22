@@ -65,6 +65,9 @@ div.drawer-paper{
         visibility: hidden;
     }
     .list-of-notes{
+        .add-note-btn{
+            background-color: $primary-color;
+        }
         .list-item-note-selected{
             background-color: $secondary-color;
             & .note-item-text-selected > span{
