@@ -11,6 +11,7 @@ import { INote } from '../models/note.interface';
 import { async } from 'q';
 import { databaseSvc } from '../services/database.service';
 import { debounceTime } from 'rxjs/operators';
+import { Delta, Sources } from 'quill';
 
 interface Props extends StoreState{
   dispatch?:<T>(action:IReduxAction<T>)=>any;
@@ -56,7 +57,11 @@ class NoteEditor extends Component<Props, State> {
     this.setState({...this.state,loading:true});
   }
 
-  onBodyChange(body:string){
+  onBodyChange(body:string,delta:Delta,source:Sources){
+    if(source!="user"){
+      return;
+    }
+
     const note = this.props.selectedNote;
     note.Body = body;
     this.props.dispatch(new ReduxAction(ActionTypes.SET_SELECTED_NOTE, note).value);
@@ -78,7 +83,7 @@ class NoteEditor extends Component<Props, State> {
           </div>
         </Paper>
         <Paper classes={({root:"quill-paper-wrapper"})} square >
-          <ReactQuill onChange={e=>this.onBodyChange(e)} readOnly={!selectedNote} value={selectedNote? selectedNote.Body:''} placeholder="write your notes :)" theme="snow"></ReactQuill>
+          <ReactQuill onChange={(e,delta,source)=>this.onBodyChange(e,delta,source)} readOnly={!selectedNote} value={selectedNote? selectedNote.Body:''} placeholder="write your notes :)" theme="snow"></ReactQuill>
           <IconButton onClick={e=>this.onDeleteNote(this.props.selectedNote)} classes={({root:"delete-btn "+(!selectedNote&&"hidden")})}>
             <i style={({fontSize:'20px'})} className="fas fa-trash-alt"></i>
           </IconButton>
