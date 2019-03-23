@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import ReactQuill from 'react-quill';
 import { StoreState } from '../redux/store-state';
-import { Paper, TextField, Typography, Button, IconButton, Hidden, CircularProgress } from '@material-ui/core';
+import { Paper, TextField, Typography, Button, IconButton, Hidden, CircularProgress, Icon } from '@material-ui/core';
 import { Subject } from 'rxjs';
 import { IReduxAction, ReduxAction } from '../redux/redux-action.class';
 import { ActionTypes } from '../redux/action-types';
@@ -72,18 +72,35 @@ class NoteEditor extends Component<Props, State> {
   render() {
     const { selectedNote } = this.props;
     return (
-      <div className="note-editor-component">
-        <Paper square>
+      <div className={"note-editor-component"}>
+        <div className={"empty-editor-wrapper "+(selectedNote && "hidden")}>
+          <div className={"empty-editor-paper"}>
+            <div>
+              <Icon>
+                <i className="backdrop-icon fas fa-book"></i>
+              </Icon>
+            </div>
+          </div>        
+        </div> 
+        <Paper classes={({root:(!selectedNote && "hidden")})} square>
           <div className="title-wraper">
-            <TextField id="txt-note-title" onChange={e=>this.onTitleChange(e.target.value)} classes={({root:'txt-title'})} disabled={!selectedNote} label="Title" value={selectedNote? selectedNote.Title:''}></TextField>
+            <TextField id="txt-note-title" 
+              label="Title" 
+              onChange={e=>this.onTitleChange(e.target.value)} 
+              classes={({root:'txt-title'})} 
+              disabled={!selectedNote} 
+              value={selectedNote? selectedNote.Title:''}></TextField>
             <IconButton disabled={!selectedNote} onClick={this.onCloseNote} color="default">
               <i style={({fontSize:'20px'})} className="fas fa-times-circle"></i>
             </IconButton>
             <CircularProgress color="secondary" className={"editor-save-progress "+(!this.state.loading && "hidden")} />
           </div>
         </Paper>
-        <Paper classes={({root:"quill-paper-wrapper"})} square >
-          <ReactQuill onChange={(e,delta,source)=>this.onBodyChange(e,delta,source)} readOnly={!selectedNote} value={selectedNote? selectedNote.Body:''} placeholder="write your notes :)" theme="snow"></ReactQuill>
+        <Paper classes={({root:"quill-paper-wrapper "+(!selectedNote && "hidden")})} square >
+          <ReactQuill onChange={(e,delta,source)=>this.onBodyChange(e,delta,source)} 
+            readOnly={!selectedNote} 
+            value={selectedNote? selectedNote.Body:''} 
+            placeholder={selectedNote? "Write your notes :)":"Select a note from your list.."} theme="snow" />
         </Paper>
       </div>
     )

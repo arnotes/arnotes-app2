@@ -110,6 +110,19 @@ div.drawer-paper{
 }
 
 .note-editor-component{
+    .empty-editor-wrapper{
+        .empty-editor-paper{
+            padding: 10px 15px;
+            display: flex;
+            margin: auto;
+            margin-top: 25px;
+            width: 300px;
+            .backdrop-icon{
+                font-size: 290px;
+                color: #424242;
+            }
+        }
+    }
     .actions-wrapper{
         display: flex;
         flex-direction: row-reverse;
@@ -149,6 +162,7 @@ div.drawer-paper{
                 border-color: transparent;
                 color: white;
                 .ql-editor{
+                    padding-top: 30px;
                     min-height: 250px;
                     &.ql-blank::before{
                         color: gray;
