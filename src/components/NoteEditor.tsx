@@ -100,7 +100,7 @@ class NoteEditor extends Component<Props, State> {
           <ReactQuill onChange={(e,delta,source)=>this.onBodyChange(e,delta,source)} 
             readOnly={!selectedNote} 
             value={selectedNote? selectedNote.Body:''} 
-            placeholder={selectedNote? "Write your notes :)":"Select a note from your list.."} theme="snow" />
+            placeholder="write your notes :)" theme="snow" />
         </Paper>
       </div>
     )
