@@ -48,11 +48,11 @@ class NoteList extends Component<Props,State> {
     const selectedNoteID = this.props && this.props.selectedNote && this.props.selectedNote.ID || "";
     const searchToLower = (this.props.strSearch||"").toLowerCase();
     const filtered = (this.props.notes||[])
-                          .filter(n => 
-                                    n.Body.toLowerCase().includes(searchToLower) ||
+                          .slice(0)
+                          .filter(n => n.Body.toLowerCase().includes(searchToLower) ||
                                     n.Title.toLocaleLowerCase().includes(searchToLower) ||
-                                    n.ID == selectedNoteID
-                                  );
+                                    n.ID == selectedNoteID)
+                          .sort((a,b)=>a.Title.localeCompare(b.Title));
     return filtered;
   }
 

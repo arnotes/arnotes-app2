@@ -19,6 +19,8 @@ interface Props extends StoreState{
 
 interface State{
   loading?:boolean;
+  title?:string;
+  body?:string;
 }
 
 class NoteEditor extends Component<Props, State> {
@@ -28,11 +30,12 @@ class NoteEditor extends Component<Props, State> {
     this.state = {};
   }
 
-  sbjChange = new Subject();
+  sbjChange = new Subject<{title:string,body:string}>();
 
   componentWillMount(){
     this.sbjChange.pipe(debounceTime(500))
       .subscribe(async ()=>{
+        this.props.dispatch(new ReduxAction(ActionTypes.SET_SELECTED_NOTE, this.props.selectedNote).value);
         await databaseSvc.updateItem('notes', this.props.selectedNote);
         this.setState({...this.state,loading:false});
       });
@@ -52,9 +55,8 @@ class NoteEditor extends Component<Props, State> {
   onTitleChange(title:string){
     const note = this.props.selectedNote;
     note.Title = title;
-    this.props.dispatch(new ReduxAction(ActionTypes.SET_SELECTED_NOTE, note).value);
-    this.sbjChange.next();
-    this.setState({...this.state,loading:true});
+    this.sbjChange.next({title:this.state.title, body:this.state.body});
+    this.setState({...this.state,loading:true,title:title});
   }
 
   onBodyChange(body:string,delta:Delta,source:Sources){
@@ -64,13 +66,21 @@ class NoteEditor extends Component<Props, State> {
 
     const note = this.props.selectedNote;
     note.Body = body;
-    this.props.dispatch(new ReduxAction(ActionTypes.SET_SELECTED_NOTE, note).value);
-    this.sbjChange.next();
-    this.setState({...this.state,loading:true});
+    this.sbjChange.next({title:this.state.title, body:this.state.body});
+    this.setState({...this.state,loading:true,body:body});
   }
 
   render() {
     const { selectedNote } = this.props;
+    let { title,body } = this.state;
+    if(title==null){
+      title = selectedNote && selectedNote.Title || "";
+    }    
+
+    if(body==null){
+      body = selectedNote && selectedNote.Body || "";
+    }    
+
     return (
       <div className={"note-editor-component"}>
         <div className={"empty-editor-wrapper "+(selectedNote && "hidden")}>
@@ -89,7 +99,7 @@ class NoteEditor extends Component<Props, State> {
               onChange={e=>this.onTitleChange(e.target.value)} 
               classes={({root:'txt-title'})} 
               disabled={!selectedNote} 
-              value={selectedNote? selectedNote.Title:''}></TextField>
+              value={title}></TextField>
             <IconButton disabled={!selectedNote} onClick={this.onCloseNote} color="default">
               <i style={({fontSize:'20px'})} className="fas fa-times-circle"></i>
             </IconButton>
@@ -99,7 +109,7 @@ class NoteEditor extends Component<Props, State> {
         <Paper classes={({root:"quill-paper-wrapper "+(!selectedNote && "hidden")})} square >
           <ReactQuill onChange={(e,delta,source)=>this.onBodyChange(e,delta,source)} 
             readOnly={!selectedNote} 
-            value={selectedNote? selectedNote.Body:''} 
+            value={body} 
             placeholder="write your notes :)" theme="snow" />
         </Paper>
       </div>
