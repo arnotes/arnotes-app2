@@ -32,6 +32,8 @@ class NoteEditor extends Component<Props, State> {
 
   sbjChange = new Subject<{title:string,body:string}>();
 
+  currentNoteID:string = null;
+
   componentWillMount(){
     this.sbjChange.pipe(debounceTime(500))
       .subscribe(async ()=>{
@@ -39,6 +41,15 @@ class NoteEditor extends Component<Props, State> {
         await databaseSvc.updateItem('notes', this.props.selectedNote);
         this.setState({...this.state,loading:false});
       });
+  }
+
+  componentWillReceiveProps(a,b){
+    const prop = a as Props;
+    const upcomingNoteID = prop.selectedNote && prop.selectedNote.ID || null;
+    if(this.currentNoteID != upcomingNoteID){
+      this.setState({...this.state,title:null,body:null});
+    }
+    this.currentNoteID = prop.selectedNote && prop.selectedNote.ID || null;
   }
 
   onCloseNote = ()=>{
