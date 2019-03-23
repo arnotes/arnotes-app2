@@ -5,7 +5,7 @@ import { StoreState } from '../redux/store-state';
 import { IReduxAction, ReduxAction } from '../redux/redux-action.class';
 import { databaseSvc } from '../services/database.service';
 import { INote } from '../models/note.interface';
-import { Paper, InputBase, Icon, LinearProgress, List, ListItem, ListItemText, ButtonBase, Button, Divider, ListItemIcon } from '@material-ui/core';
+import { Paper, InputBase, Icon, LinearProgress, List, ListItem, ListItemText, ButtonBase, Button, Divider, ListItemIcon, Checkbox } from '@material-ui/core';
 import color from '@material-ui/core/colors/lime';
 import { ActionTypes } from '../redux/action-types';
 import { Subject } from 'rxjs';
@@ -21,12 +21,14 @@ interface Props extends StoreState{
 interface State{
   loading?:boolean;
   strSearch?:string;
+  checkedNotes?:INote[];
 }
 
 class NoteList extends Component<Props,State> {
   constructor(p){
     super(p);
     this.state = {
+      checkedNotes:[],
       strSearch:null
     };
   }
@@ -64,6 +66,7 @@ class NoteList extends Component<Props,State> {
   }
 
   onClickAddNote = async ()=>{
+    console.log('aw');
     const dummyTitle = 'NEW_NOTE_'+(new Date().getTime().toString());
     let newNote:INote = {
       Body:'',
@@ -81,12 +84,38 @@ class NoteList extends Component<Props,State> {
     }, 100);
   }
 
+  onClickDeleteNotes = async ()=>{
+    const notesToDelete = [...this.state.checkedNotes];
+
+    if(this.state.checkedNotes.includes(this.props.selectedNote)){
+      this.props.dispatch(new ReduxAction(ActionTypes.SET_SELECTED_NOTE, null).value);
+    }
+    this.setState({...this.state, checkedNotes:[]});
+
+    const newNoteList = this.props.notes.filter(n => !notesToDelete.includes(n));
+    this.props.dispatch(new ReduxAction(ActionTypes.SET_NOTE_LIST, newNoteList).value);
+    await databaseSvc.removeMany('notes', notesToDelete);
+  }
+
+  onNoteListCheck = (note:INote, checked:boolean)=>{
+    if(checked){
+      this.setState({...this.state, checkedNotes:[...this.state.checkedNotes,note]});
+    }else{
+      this.setState({...this.state, checkedNotes:this.state.checkedNotes.filter(n => n.ID!=note.ID)});
+    }
+  }
+
   renderListItem(note:INote, index:number){
     const selected = this.props.selectedNote == note;
+    const { checkedNotes } = this.state;
     return(
       <ListItem button dense divider key={note.ID}
-        classes={({root:selected? 'list-item-note-selected':'list-item-note'})}
+        classes={({root:selected? 'list-btn-primary':''})}
         onClick={e=>this.onClickNote(note)} >
+          <Checkbox checked={checkedNotes.includes(note)} 
+            onChange={(e,checked)=>this.onNoteListCheck(note,checked)}
+            onClick={e=>e.stopPropagation()} 
+            classes={({root:'list-chk'})}/>
         <ListItemText classes={({root:'note-item-text '+(selected&&'note-item-text-selected')})} >{note.Title}</ListItemText>
       </ListItem>
     );
@@ -103,9 +132,23 @@ class NoteList extends Component<Props,State> {
 
     return (
       <div className="note-list-component">
-        <div className="actions-bar-wrapper">
-          <br/>
-        </div>
+        <Paper classes={({root:"actions-bar-wrapper"})}>
+          <List>
+            <ListItem onClick={this.onClickAddNote} classes={({root:'list-btn-primary_'})} button dense>
+              <ListItemText classes={({root:'note-item-text'})} >CREATE NEW NOTE</ListItemText>
+              <ListItemIcon>
+                <i className="fas fa-plus-circle"></i>
+              </ListItemIcon>              
+            </ListItem>
+            <ListItem onClick={this.onClickDeleteNotes} disabled={this.state.checkedNotes.length<1} classes={({root:'list-btn-danger_'})} button dense>
+              <ListItemText classes={({root:'note-item-text'})} >DELETE NOTES</ListItemText>
+              <ListItemIcon>
+                <i className="fas fa-trash-alt"></i>
+              </ListItemIcon>              
+            </ListItem>            
+          </List>
+          &nbsp;
+        </Paper>
         <Paper classes={({root:"searchbar-paper"})} >
           <div className="search-input-wrapper">
             <InputBase onChange={this.onSearchChange}
@@ -121,12 +164,6 @@ class NoteList extends Component<Props,State> {
         </LinearProgress>
         <div className="list-of-notes">
           <List>
-            <ListItem onClick={this.onClickAddNote} classes={({root:'add-note-btn'})} button dense divider>
-              <ListItemText classes={({root:'note-item-text'})} >ADD NOTE</ListItemText>
-              <ListItemIcon>
-                <i className="fas fa-plus-circle"></i>
-              </ListItemIcon>              
-            </ListItem>
             {filteredNotes.map((n,index) => this.renderListItem(n,index))}
           </List>
         </div>     

@@ -1,6 +1,14 @@
 @import './App.medium-up.scss';
 
+
 $primary-color: #673ab7;
+$primary-color-light: #8561c5;
+$primary-color-dark: #482880;
+
+$danger-color: #D32F2F;
+$danger-color-light: #db5858;
+$danger-color-dark: #932020;
+
 $secondary-color: #00e5ff;//#eeff41;
 $secondary-text-color: rgba(0, 0, 0, 0.87);
 $semi-black: #4c4646;
@@ -26,6 +34,20 @@ body{
             }
         }
         
+    }
+}
+
+.list-btn-primary{
+    background-color: $primary-color !important;
+    &:hover{
+        background-color: $primary-color-dark !important;
+    }
+}
+
+.list-btn-danger{
+    background-color: $danger-color !important;
+    &:hover{
+        background-color: $danger-color-dark !important;
     }
 }
 
@@ -65,12 +87,17 @@ div.drawer-paper{
             margin-right: 8px;
         }
     }
+    div{
+        .add-note-btn{
+            background-color: $primary-color;
+        }
+    }
     .search-progress-complete{
         visibility: hidden;
     }
     .list-of-notes{
-        .add-note-btn{
-            background-color: $primary-color;
+        .list-chk{
+            padding: 0px;
         }
         .list-item-note-selected{
             background-color: $secondary-color;

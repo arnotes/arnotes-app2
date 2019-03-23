@@ -42,6 +42,16 @@ class FireStoreDatabase {
       .delete();
   }
 
+  removeMany<T>(collectionPath:string, items:T[]){
+    const batch = this.firestore.batch();
+    for (const item of items) {
+      const itemDocRef = this.firestore.collection(collectionPath).doc(item["ID"]);
+      batch.delete(itemDocRef);
+    }
+
+    return batch.commit();
+  }
+
   firestore = firebaseSvc.firestore();
 }
 
