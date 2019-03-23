@@ -3,4 +3,5 @@ export interface INote{
     UID: string;
     Title: string;
     Body: string;
+    Index?: number;
 }

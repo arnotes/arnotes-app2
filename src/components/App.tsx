@@ -3,6 +3,7 @@ import logo from './logo.svg';
 import '../stylesheets/App.scss';
 import 'react-quill/dist/quill.snow.css';
 import 'react-quill/dist/quill.core.css';
+import 'react-dragula/dist/dragula.min.css';
 import '@material-ui/core'
 import firebase from 'firebase';
 import { Button, CssBaseline } from '@material-ui/core';

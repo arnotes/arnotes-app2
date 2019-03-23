@@ -19,7 +19,7 @@ function user(userState:firebase.User, action:IReduxAction<firebase.User>) {
 function notes(notes:INote[], action:IReduxAction<INote[]>){
   switch (action.type) {
     case ActionTypes.SET_NOTE_LIST:
-      return [...action.data];
+      return [...action.data].sort((a,b)=>(a.Index||0)-(b.Index||0));
       break;
   
     default:

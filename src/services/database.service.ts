@@ -35,6 +35,15 @@ class FireStoreDatabase {
       .update(item);
   }
 
+  updateMany<T>(collectionPath: string, items: T[]){
+    const batch = this.firestore.batch();
+    for (const item of items) {
+      const itemDocRef = this.firestore.collection(collectionPath).doc(item["ID"]);
+      batch.update(itemDocRef, item);
+    }
+    return batch.commit();
+  }
+
   removeItem<T>(collectionPath: string, item: T) {
     return this.firestore
       .collection(collectionPath)

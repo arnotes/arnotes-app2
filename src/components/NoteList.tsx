@@ -1,5 +1,5 @@
 import React, { Component, Dispatch } from 'react'
-import PropTypes from 'prop-types'
+import PropTypes, { element } from 'prop-types'
 import { connect } from 'react-redux'
 import { StoreState } from '../redux/store-state';
 import { IReduxAction, ReduxAction } from '../redux/redux-action.class';
@@ -10,6 +10,8 @@ import color from '@material-ui/core/colors/lime';
 import { ActionTypes } from '../redux/action-types';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import * as ReactDOM from 'react-dom';
+import Dragula from 'react-dragula';
 
 interface Props extends StoreState{
   notes?:INote[];
@@ -51,8 +53,7 @@ class NoteList extends Component<Props,State> {
                           .slice(0)
                           .filter(n => n.Body.toLowerCase().includes(searchToLower) ||
                                     n.Title.toLocaleLowerCase().includes(searchToLower) ||
-                                    n.ID == selectedNoteID)
-                          .sort((a,b)=>a.Title.localeCompare(b.Title));
+                                    n.ID == selectedNoteID);
     return filtered;
   }
 
@@ -105,12 +106,48 @@ class NoteList extends Component<Props,State> {
     }
   }
 
+  onNoteListReorder(notes:INote[]){
+    databaseSvc.updateMany("notes", notes);
+  }
+
+  dragulaDecorator = (componentBackingInstance) => {
+    if (componentBackingInstance) {
+      let options = { };
+      const drake = Dragula([componentBackingInstance], options);
+      drake.on('drop', (el:HTMLElement,target:HTMLElement,source,sibling)=>{
+        const arrayMinusDroppedItem = this.props.notes.filter(n => n.ID!=el.id);
+        const siblingList = Array.from(target.children);
+        const dropIndex = siblingList.indexOf(el);
+        
+        const previousSibling = siblingList[dropIndex-1];
+        const nextSibling = siblingList[dropIndex+1];
+
+        let insertIndex = null;
+        if(previousSibling){
+          insertIndex = arrayMinusDroppedItem.findIndex(n => n.ID == previousSibling.id)+1;
+        }else if(nextSibling){
+          insertIndex = arrayMinusDroppedItem.findIndex(n => n.ID == nextSibling.id);
+        }
+
+        if(insertIndex!=null){
+          arrayMinusDroppedItem.splice(insertIndex, 0, this.props.notes.find(n => n.ID==el.id));
+          let i = 0;
+          arrayMinusDroppedItem.forEach(n => {
+            n.Index = i;
+            i++;
+          });
+          this.onNoteListReorder(arrayMinusDroppedItem);
+        }
+      })
+    }
+  };
+
   renderListItem(note:INote, index:number){
     const selected = this.props.selectedNote == note;
     const { checkedNotes } = this.state;
     return(
-      <ListItem button dense divider key={note.ID}
-        classes={({root:selected? 'list-btn-primary':''})}
+      <ListItem button dense divider key={note.ID} id={note.ID}
+        classes={({root:"note-list-item "+(selected? 'list-btn-primary':'')})}
         onClick={e=>this.onClickNote(note)} >
           <Checkbox checked={checkedNotes.includes(note)} 
             onChange={(e,checked)=>this.onNoteListCheck(note,checked)}
@@ -164,7 +201,9 @@ class NoteList extends Component<Props,State> {
         </LinearProgress>
         <div className="list-of-notes">
           <List>
-            {filteredNotes.map((n,index) => this.renderListItem(n,index))}
+            <div ref={this.dragulaDecorator}>
+              {filteredNotes.map((n,index) => this.renderListItem(n,index))}
+            </div>
           </List>
         </div>     
       </div>
