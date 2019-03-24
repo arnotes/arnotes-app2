@@ -100,9 +100,6 @@ div.drawer-paper{
         .list-chk{
             padding: 0px;
         }
-        .note-list-item{
-            touch-action: none;
-        }
         .list-item-note-selected{
             background-color: $secondary-color;
             & .note-item-text-selected > span{

@@ -112,8 +112,13 @@ class NoteList extends Component<Props,State> {
 
   dragulaDecorator = (componentBackingInstance) => {
     if (componentBackingInstance) {
-      let options = { };
+      const options = {
+        moves: function (el, container, handle) {
+        return handle.classList.contains('note-drag-handle');
+        }
+      };
       const drake = Dragula([componentBackingInstance], options);
+      
       drake.on('drop', (el:HTMLElement,target:HTMLElement,source,sibling)=>{
         const arrayMinusDroppedItem = this.props.notes.filter(n => n.ID!=el.id);
         const siblingList = Array.from(target.children);
@@ -154,6 +159,9 @@ class NoteList extends Component<Props,State> {
             onClick={e=>e.stopPropagation()} 
             classes={({root:'list-chk'})}/>
         <ListItemText classes={({root:'note-item-text '+(selected&&'note-item-text-selected')})} >{note.Title}</ListItemText>
+        <div className="note-drag-handle">
+          <i className="fas fa-arrows-alt-v"></i>
+        </div>
       </ListItem>
     );
   }
