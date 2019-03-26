@@ -12,6 +12,7 @@ import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import * as ReactDOM from 'react-dom';
 import Dragula from 'react-dragula';
+import { ToastContainer, toast } from 'react-toastify';
 
 interface Props extends StoreState{
   notes?:INote[];
@@ -67,22 +68,26 @@ class NoteList extends Component<Props,State> {
   }
 
   onClickAddNote = async ()=>{
-    console.log('aw');
     const dummyTitle = 'NEW_NOTE_'+(new Date().getTime().toString());
     let newNote:INote = {
       Body:'',
       Title:dummyTitle,
       UID:this.props.user.uid
     }
-    await databaseSvc.addToCollection('notes',newNote);
+    
     const newNoteList = [...this.props.notes, newNote];
     this.props.dispatch(new ReduxAction(ActionTypes.SET_NOTE_LIST,newNoteList).value);
     this.props.dispatch(new ReduxAction(ActionTypes.SET_SELECTED_NOTE, newNote).value);
+
+    toast.info("New note added!", { position:"bottom-right", hideProgressBar:true, autoClose:2500 });
+
     setTimeout(() => {
       const titleInput = document.querySelector('#txt-note-title') as HTMLInputElement;
       titleInput.focus();
       titleInput.select();
     }, 100);
+
+    await databaseSvc.addToCollection('notes',newNote);
   }
 
   onClickDeleteNotes = async ()=>{
@@ -95,6 +100,9 @@ class NoteList extends Component<Props,State> {
 
     const newNoteList = this.props.notes.filter(n => !notesToDelete.includes(n));
     this.props.dispatch(new ReduxAction(ActionTypes.SET_NOTE_LIST, newNoteList).value);
+
+    toast.info(`${notesToDelete.length} note/s deleted!`, { position:"bottom-right", hideProgressBar:true, autoClose:2500 });
+
     await databaseSvc.removeMany('notes', notesToDelete);
   }
 
@@ -214,6 +222,7 @@ class NoteList extends Component<Props,State> {
             </div>
           </List>
         </div>     
+        <ToastContainer />
       </div>
     )
   }

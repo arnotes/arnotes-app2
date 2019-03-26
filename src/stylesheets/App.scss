@@ -2,6 +2,9 @@
 @import './App.small-down.scss';
 @import './Dragula.scss';
 
+.Toastify__toast-body{
+    text-align: center !important;
+}
 
 $primary-color: #673ab7;
 $primary-color-light: #8561c5;
