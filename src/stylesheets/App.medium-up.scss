@@ -1,10 +1,15 @@
-@media (min-width: 768px) { 
+@media (min-width: 600px) { 
   body{
-      div.layout-component.drawer-open{
-          header,.layout-content{
-              margin-left: 320px;
-              width: calc(100% - 320px);
-          }        
+      div.layout-component{
+					&.drawer-open{
+						header,.layout-content{
+								margin-left: 320px;
+								width: calc(100% - 320px);
+						}
+					}
+          .layout-content{
+            padding: 10px;
+        	}
       }
   }
 }

@@ -1,3 +1,8 @@
-@media (max-width: 767px) { 
-
+@media (max-width: 599px) { 
+  .quill-paper-wrapper{
+    margin-top: 0px !important;
+  }
+  .ql-editor{
+      max-height: calc(100vh - 227.5px) !important;
+  }
 }
