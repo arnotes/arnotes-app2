@@ -10,6 +10,7 @@ import firebase from 'firebase';
 import { Button, CssBaseline } from '@material-ui/core';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import AuthProtector from './AuthProtector';
+import { ToastContainer } from 'react-toastify';
 
 const theme = createMuiTheme({
   palette:{
@@ -38,6 +39,7 @@ class App extends Component<AppProps> {
       <MuiThemeProvider theme={theme}>
           <CssBaseline/>
           <AuthProtector></AuthProtector>
+          <ToastContainer />
       </MuiThemeProvider>
     );
   }

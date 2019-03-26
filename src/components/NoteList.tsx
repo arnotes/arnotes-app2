@@ -222,7 +222,7 @@ class NoteList extends Component<Props,State> {
             </div>
           </List>
         </div>     
-        <ToastContainer />
+        
       </div>
     )
   }
