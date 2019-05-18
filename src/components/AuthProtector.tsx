@@ -11,6 +11,7 @@ import Login from './Login';
 import Layout from './Layout';
 import { databaseSvc } from '../services/database.service';
 import { INote } from '../models/note.interface';
+import { IFolder } from '../models/folder.interface';
 
 interface AuthProtectorProps extends StoreState {
   dispatch?:(action:IReduxAction<any>)=>any
@@ -45,8 +46,10 @@ class AuthProtector extends Component<AuthProtectorProps, AuthProtectorState> {
   }
 
   async loadNotes(){
-    const notes = await databaseSvc.getCollection<INote>("notes", (qry)=>qry.where("UID","==",this.props.user.uid));
-    this.props.dispatch(new ReduxAction(ActionTypes.SET_NOTE_LIST, notes).value);
+    const folders = databaseSvc.getCollection<IFolder>("folders",(qry)=>qry.where("UID","==",this.props.user.uid));
+    const notes = databaseSvc.getCollection<INote>("notes", (qry)=>qry.where("UID","==",this.props.user.uid));
+    this.props.dispatch(new ReduxAction(ActionTypes.SET_NOTE_LIST, await notes).value);
+    this.props.dispatch(new ReduxAction(ActionTypes.SET_FOLDER_LIST, await folders).value);
   }  
 
   render() {

@@ -13,9 +13,12 @@ import { debounceTime } from 'rxjs/operators';
 import * as ReactDOM from 'react-dom';
 import Dragula from 'react-dragula';
 import { ToastContainer, toast } from 'react-toastify';
+import Folder from './Folder';
+import { IFolder } from '../models/folder.interface';
 
 interface Props extends StoreState{
   notes?:INote[];
+  folders?:IFolder[];
   dispatch?:Dispatch<IReduxAction<any>>;
   onSelectNote?:(note:INote)=>any
   onAddNote?:(note:INote)=>any
@@ -67,27 +70,26 @@ class NoteList extends Component<Props,State> {
     this.props.onSelectNote && this.props.onSelectNote(note);
   }
 
-  onClickAddNote = async ()=>{
+  onClickAddNote = async (folderID:string)=>{
     const dummyTitle = 'NEW_NOTE_'+(new Date().getTime().toString());
     let newNote:INote = {
       Body:'',
       Title:dummyTitle,
-      UID:this.props.user.uid
+      UID:this.props.user.uid,
+      FolderID: folderID
     }
     
+    await databaseSvc.addToCollection('notes',newNote);
     const newNoteList = [...this.props.notes, newNote];
     this.props.dispatch(new ReduxAction(ActionTypes.SET_NOTE_LIST,newNoteList).value);
     this.props.dispatch(new ReduxAction(ActionTypes.SET_SELECTED_NOTE, newNote).value);
 
     toast.info("New note added!", { position:"bottom-right", hideProgressBar:true, autoClose:2500 });
-
     setTimeout(() => {
       const titleInput = document.querySelector('#txt-note-title') as HTMLInputElement;
       titleInput.focus();
       titleInput.select();
     }, 100);
-
-    await databaseSvc.addToCollection('notes',newNote);
   }
 
   onClickDeleteNotes = async ()=>{
@@ -106,6 +108,31 @@ class NoteList extends Component<Props,State> {
     await databaseSvc.removeMany('notes', notesToDelete);
   }
 
+  onClickAddFolder = async ()=>{
+    const newFolder:IFolder = {
+      ID:null,
+      Name: "NEW_FOLDER_"+(new Date().getTime()),
+      UID: this.props.user.uid
+    }
+    await databaseSvc.addToCollection("folders", newFolder);
+    this.props.dispatch(new ReduxAction(ActionTypes.SET_FOLDER_LIST,[...this.props.folders,newFolder]).value);
+    toast.info(`New folder added!`, { position:"bottom-right", hideProgressBar:true, autoClose:2500 });
+  }
+
+  onClickDeleteFolder = async (folder:IFolder)=>{
+    const newFolderList = this.props.folders.filter(f => f.ID!=folder.ID);
+    const notesFromFolder = this.props.notes.filter(n => n.FolderID==folder.ID);
+    notesFromFolder.forEach(n => n.FolderID=null);
+
+    console.log(folder, notesFromFolder);
+    await databaseSvc.removeItem("folders", folder);
+    await databaseSvc.updateMany("notes",notesFromFolder);
+
+    this.props.dispatch(new ReduxAction(ActionTypes.SET_FOLDER_LIST, newFolderList).value);
+    this.props.dispatch(new ReduxAction(ActionTypes.SET_NOTE_LIST, [...this.props.notes]).value);
+    toast.info(`New folder added!`, { position:"bottom-right", hideProgressBar:true, autoClose:2500 });
+  }
+
   onNoteListCheck = (note:INote, checked:boolean)=>{
     if(checked){
       this.setState({...this.state, checkedNotes:[...this.state.checkedNotes,note]});
@@ -118,66 +145,11 @@ class NoteList extends Component<Props,State> {
     databaseSvc.updateMany("notes", notes);
   }
 
-  dragulaDecorator = (componentBackingInstance) => {
-    if (componentBackingInstance) {
-      const options = {
-        moves: function (el, container, handle) {
-        return handle.classList.contains('note-drag-handle');
-        }
-      };
-      const drake = Dragula([componentBackingInstance], options);
-      
-      drake.on('drop', (el:HTMLElement,target:HTMLElement,source,sibling)=>{
-        const arrayMinusDroppedItem = this.props.notes.filter(n => n.ID!=el.id);
-        const siblingList = Array.from(target.children);
-        const dropIndex = siblingList.indexOf(el);
-        
-        const previousSibling = siblingList[dropIndex-1];
-        const nextSibling = siblingList[dropIndex+1];
-
-        let insertIndex = null;
-        if(previousSibling){
-          insertIndex = arrayMinusDroppedItem.findIndex(n => n.ID == previousSibling.id)+1;
-        }else if(nextSibling){
-          insertIndex = arrayMinusDroppedItem.findIndex(n => n.ID == nextSibling.id);
-        }
-
-        if(insertIndex!=null){
-          arrayMinusDroppedItem.splice(insertIndex, 0, this.props.notes.find(n => n.ID==el.id));
-          let i = 0;
-          arrayMinusDroppedItem.forEach(n => {
-            n.Index = i;
-            i++;
-          });
-          this.onNoteListReorder(arrayMinusDroppedItem);
-        }
-      })
-    }
-  };
-
-  renderListItem(note:INote, index:number){
-    const selected = this.props.selectedNote == note;
-    const { checkedNotes } = this.state;
-    return(
-      <ListItem button dense divider key={note.ID} id={note.ID}
-        classes={({root:"note-list-item "+(selected? 'list-btn-primary':'')})}
-        onClick={e=>this.onClickNote(note)} >
-          <Checkbox checked={checkedNotes.includes(note)} 
-            onChange={(e,checked)=>this.onNoteListCheck(note,checked)}
-            onClick={e=>e.stopPropagation()} 
-            classes={({root:'list-chk'})}/>
-        <ListItemText classes={({root:'note-item-text '+(selected&&'note-item-text-selected')})} >{note.Title}</ListItemText>
-        <div className="note-drag-handle">
-          <i className="fas fa-arrows-alt-v"></i>
-        </div>
-      </ListItem>
-    );
-  }
-
   render() {
     const { loading } = this.state;
-    const filteredNotes = this.getFilterNotes();
     let strSearch = this.state.strSearch;
+    const folders = (this.props.folders||[]).sort((a,b)=>a.Name.toLowerCase().localeCompare(b.Name.toLowerCase()));
+    const foldersWithGeneral:IFolder[] = [{ID:null,Name:"General Notes",UID:this.props.user.uid},...folders];
 
     if(strSearch==null){
       strSearch = this.props.strSearch || "";
@@ -187,17 +159,11 @@ class NoteList extends Component<Props,State> {
       <div className="note-list-component">
         <Paper classes={({root:"actions-bar-wrapper"})}>
           <List>
-            <ListItem onClick={this.onClickAddNote} classes={({root:'list-btn-primary_'})} button dense>
-              <ListItemText classes={({root:'note-item-text'})} >CREATE NEW NOTE</ListItemText>
+            <ListItem button dense onClick={this.onClickAddFolder}>
+              <ListItemText classes={({root:'note-item-text'})} >ADD FOLDER</ListItemText>
               <ListItemIcon>
-                <i className="fas fa-plus-circle"></i>
-              </ListItemIcon>              
-            </ListItem>
-            <ListItem onClick={this.onClickDeleteNotes} disabled={this.state.checkedNotes.length<1} classes={({root:'list-btn-danger_'})} button dense>
-              <ListItemText classes={({root:'note-item-text'})} >DELETE NOTES</ListItemText>
-              <ListItemIcon>
-                <i className="fas fa-trash-alt"></i>
-              </ListItemIcon>              
+                <i className="fas fa-folder-plus"></i>
+              </ListItemIcon>        
             </ListItem>            
           </List>
           &nbsp;
@@ -216,13 +182,18 @@ class NoteList extends Component<Props,State> {
           color="primary">
         </LinearProgress>
         <div className="list-of-notes">
-          <List>
-            <div ref={this.dragulaDecorator}>
-              {filteredNotes.map((n,index) => this.renderListItem(n,index))}
-            </div>
-          </List>
-        </div>     
-        
+          {
+            foldersWithGeneral.map(folder=>(
+              <Folder key={folder.ID} checkedNotes={this.state.checkedNotes} 
+                    onCheckNote={this.onNoteListCheck} 
+                    onClickAddNote={this.onClickAddNote}
+                    onClickDeleteNotes={this.onClickDeleteNotes}
+                    onClickDeleteFolder={this.onClickDeleteFolder}
+                    folder={folder}>
+              </Folder>)
+            )
+          }
+        </div>
       </div>
     )
   }

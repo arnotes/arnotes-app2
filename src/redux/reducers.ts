@@ -3,6 +3,7 @@ import { ActionTypes } from "./action-types";
 import { combineReducers } from "redux";
 import { INote } from "../models/note.interface";
 import { StoreState } from "./store-state";
+import { IFolder } from "../models/folder.interface";
 
 function user(userState:firebase.User, action:IReduxAction<firebase.User>) {
   switch (action.type) {
@@ -19,12 +20,23 @@ function user(userState:firebase.User, action:IReduxAction<firebase.User>) {
 function notes(notes:INote[], action:IReduxAction<INote[]>){
   switch (action.type) {
     case ActionTypes.SET_NOTE_LIST:
-      return [...action.data].sort((a,b)=>(a.Index||0)-(b.Index||0));
+      return [...action.data];
       break;
   
     default:
       return notes||[];
       break;
+  }
+}
+
+function folders(folders:IFolder[], action:IReduxAction<IFolder[]>){
+  switch (action.type){
+    case ActionTypes.SET_FOLDER_LIST:
+      return [...action.data];
+      break;
+    default:
+      return folders||[];
+      break;      
   }
 }
 
@@ -74,6 +86,7 @@ function selectedNote(note:INote, action:IReduxAction<INote>){
 export const combinedReducers = combineReducers({
   user,
   notes:notes,
+  folders,
   strSearch:strSearch,
   filteredNotes:filteredNotes,
   selectedNote:selectedNote

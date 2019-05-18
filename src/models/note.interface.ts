@@ -4,4 +4,5 @@ export interface INote{
     Title: string;
     Body: string;
     Index?: number;
+    FolderID?: string;
 }

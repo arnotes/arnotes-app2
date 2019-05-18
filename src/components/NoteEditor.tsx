@@ -15,6 +15,7 @@ import { Delta, Sources } from 'quill';
 
 interface Props extends StoreState{
   dispatch?:<T>(action:IReduxAction<T>)=>any;
+  notes?:INote[];
 }
 
 interface State{
@@ -38,6 +39,7 @@ class NoteEditor extends Component<Props, State> {
     this.sbjChange.pipe(debounceTime(500))
       .subscribe(async ()=>{
         this.props.dispatch(new ReduxAction(ActionTypes.SET_SELECTED_NOTE, this.props.selectedNote).value);
+        this.props.dispatch(new ReduxAction(ActionTypes.SET_NOTE_LIST, [...this.props.notes]).value);
         await databaseSvc.updateItem('notes', this.props.selectedNote);
         this.setState({...this.state,loading:false});
       });
