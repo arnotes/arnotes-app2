@@ -130,7 +130,7 @@ class NoteList extends Component<Props,State> {
 
     this.props.dispatch(new ReduxAction(ActionTypes.SET_FOLDER_LIST, newFolderList).value);
     this.props.dispatch(new ReduxAction(ActionTypes.SET_NOTE_LIST, [...this.props.notes]).value);
-    toast.info(`New folder added!`, { position:"bottom-right", hideProgressBar:true, autoClose:2500 });
+    toast.info(`Folder deleted!`, { position:"bottom-right", hideProgressBar:true, autoClose:2500 });
   }
 
   onNoteListCheck = (note:INote, checked:boolean)=>{

@@ -12,6 +12,7 @@ import { Badge, ListItem, List, ListItemText, Checkbox, ListItemIcon, Fab, IconB
 import { ReduxAction } from '../redux/redux-action.class';
 import { ActionTypes } from '../redux/action-types';
 import { TextDialog } from './TextDialog';
+import { useConfirmDialog } from '../hooks/useConfirmDialog';
 
 export interface IAppProps {
   strSearch?:string;
@@ -38,6 +39,8 @@ function Folder (props: IAppProps) {
 
     const selectedNote = props.selectedNote;
     const checkedNotes = props.checkedNotes||[];
+    const [showConfirm, confirmDialog] = useConfirmDialog();
+
     let showTextDialog:(val:string)=>Promise<string> = null;
 
     const handleNoteCheckChange = React.useCallback((note:INote,checked:boolean)=>{
@@ -57,17 +60,21 @@ function Folder (props: IAppProps) {
     const handleAddNote = React.useCallback(()=>{
       props.onClickAddNote && props.onClickAddNote(folder.ID);
       handleMenuClose();
-    },[]);
+    },[folder]);
 
-    const handleDeleteNotes = React.useCallback(()=>{
-      props.onClickDeleteNotes && props.onClickDeleteNotes();
+    const handleDeleteNotes = React.useCallback(async ()=>{
       handleMenuClose();
-    },[]);
+      if(await showConfirm(`Confirm`,`Delete Notes?`)){
+        props.onClickDeleteNotes && props.onClickDeleteNotes();
+      }
+    },[folder,notes]);
 
-    const handleDeleteFolder = React.useCallback(()=>{
-      props.onClickDeleteFolder && props.onClickDeleteFolder(props.folder);
+    const handleDeleteFolder = React.useCallback(async ()=>{
       handleMenuClose();
-    },[]);
+      if(await showConfirm(`Confirm`,`Delete folder "${folder.Name}?"`)){
+        props.onClickDeleteFolder && props.onClickDeleteFolder(props.folder);
+      }
+    },[folder]);
 
     const handleRename = React.useCallback(async ()=>{
       handleMenuClose();
@@ -75,76 +82,79 @@ function Folder (props: IAppProps) {
       if(response != null){
         props.onUpdateFolder && props.onUpdateFolder({...folder,Name:response});
       }
-    },[]);        
+    },[folder]);
 
     return (
-      <ExpansionPanel expanded={expanded} onChange={()=>setExpanded(!expanded)}>
-        <ExpansionPanelSummary expandIcon={<i className="fas fa-angle-down"></i>}>
-          <Badge color={notes.length? "primary":"error"} showZero badgeContent={notes.length}>
-            <Typography>{folder.Name}</Typography>
-          </Badge>
-        </ExpansionPanelSummary>
-        <ExpansionPanelDetails>
-          <List dense disablePadding style={({width:"100%"})}>
-          {
-            notes.map((n,index)=>(
-            <ListItem divider={index+1 < notes.length} 
-                      dense
-                      key={n.ID} 
-                      button 
-                      selected={n.ID==(selectedNote && selectedNote.ID || "")}
-                      onClick={()=>props.dispatch(new ReduxAction(ActionTypes.SET_SELECTED_NOTE,n).value)} >
-              <Checkbox style={({padding:"0px"})} 
-                  onClick={e=>e.stopPropagation()} 
-                  onChange={(e,checked)=>handleNoteCheckChange(n,checked)} 
-                  checked={checkedNotes.includes(n)}>
-              </Checkbox>
-              <ListItemText primary={n.Title}/>
-            </ListItem>    
-            ))
-          }
-          </List>
-        </ExpansionPanelDetails>
-        <ExpansionPanelActions>
-          <Fab size="small" color="primary" onClick={handleClickMenu}>
-            <i className="fas fa-ellipsis-v"></i>
-          </Fab>
-        </ExpansionPanelActions>
-        <Menu
-          id="simple-menu"
-          anchorEl={menuAnchor}
-          open={Boolean(menuAnchor)}
-          onClose={handleMenuClose}
-        >
-          {
-          folder.ID!=null &&
-          <MenuItem onClick={handleRename}>
-            <i className="fas fa-pen"></i>
-            &nbsp; Rename
-          </MenuItem>
-          }        
-          <MenuItem onClick={handleAddNote}>
-            <i className="fas fa-file-medical"></i>
-            &nbsp; Add Note
-          </MenuItem>
-          {
-          checkedNotes.length &&
-          <MenuItem onClick={handleDeleteNotes}>
-            <i style={({color:"#F44336"})} className="fas fa-file"></i>
-            &nbsp; Delete Notes
-          </MenuItem>
-          }
-          {
-          folder.ID!=null &&
-          <MenuItem onClick={handleDeleteFolder}>
-            <i style={({color:"#F44336"})} className="fas fa-folder"></i>
-            &nbsp; Delete Folder
-          </MenuItem>
-          }
-        </Menu>
+      <div>
+        <ExpansionPanel expanded={expanded} onChange={()=>setExpanded(!expanded)}>
+          <ExpansionPanelSummary expandIcon={<i className="fas fa-angle-down"></i>}>
+            <Badge color={notes.length? "primary":"error"} showZero badgeContent={notes.length}>
+              <Typography>{folder.Name}</Typography>
+            </Badge>
+          </ExpansionPanelSummary>
+          <ExpansionPanelDetails style={({paddingLeft:"5px",paddingRight:"5px"})}>
+            <List dense disablePadding style={({width:"100%"})}>
+            {
+              notes.map((n,index)=>(
+              <ListItem divider={index+1 < notes.length} 
+                        dense
+                        key={n.ID} 
+                        button 
+                        selected={n.ID==(selectedNote && selectedNote.ID || "")}
+                        onClick={()=>props.dispatch(new ReduxAction(ActionTypes.SET_SELECTED_NOTE,n).value)} >
+                <Checkbox style={({padding:"0px"})} 
+                    onClick={e=>e.stopPropagation()} 
+                    onChange={(e,checked)=>handleNoteCheckChange(n,checked)} 
+                    checked={checkedNotes.includes(n)}>
+                </Checkbox>
+                <ListItemText primary={n.Title}/>
+              </ListItem>    
+              ))
+            }
+            </List>
+          </ExpansionPanelDetails>
+          <ExpansionPanelActions>
+            <Fab size="small" color="primary" onClick={handleClickMenu}>
+              <i className="fas fa-ellipsis-v"></i>
+            </Fab>
+          </ExpansionPanelActions>
+          <Menu
+            id="simple-menu"
+            anchorEl={menuAnchor}
+            open={Boolean(menuAnchor)}
+            onClose={handleMenuClose}
+          >
+            <MenuItem onClick={handleAddNote}>
+              <i className="fas fa-file-medical"></i>
+              &nbsp; Add Note
+            </MenuItem>
+            {
+            folder.ID!=null &&
+            <MenuItem onClick={handleRename}>
+              <i className="fas fa-pen"></i>
+              &nbsp; Rename
+            </MenuItem>
+            }        
+            {
+            checkedNotes.length &&
+            <MenuItem onClick={handleDeleteNotes}>
+              <i style={({color:"#F44336"})} className="fas fa-file"></i>
+              &nbsp; Delete Notes
+            </MenuItem>
+            }
+            {
+            folder.ID!=null &&
+            <MenuItem onClick={handleDeleteFolder}>
+              <i style={({color:"#F44336"})} className="fas fa-folder"></i>
+              &nbsp; Delete Folder
+            </MenuItem>
+            }
+          </Menu>
 
-        <TextDialog title="Rename Folder" label="Folder Name" setShow={fn=>showTextDialog=fn}></TextDialog>
-      </ExpansionPanel>
+          <TextDialog title="Rename Folder" label="Folder Name" setShow={fn=>showTextDialog=fn}></TextDialog>
+          {confirmDialog}
+        </ExpansionPanel>
+      </div>
     );
 }
 
