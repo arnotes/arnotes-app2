@@ -14,6 +14,7 @@ import * as ReactDOM from 'react-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import Folder from './Folder';
 import { IFolder } from '../models/folder.interface';
+import { Droppable } from './Droppable';
 
 interface Props extends StoreState{
   notes?:INote[];
@@ -149,6 +150,24 @@ class NoteList extends Component<Props,State> {
     }
   }
 
+  onDropToFolder = async (note:INote,folder:IFolder) =>{
+    if(note && folder){
+      note.FolderID = folder.ID;
+      this.props.dispatch(new ReduxAction(ActionTypes.SET_NOTE_LIST, [...this.props.notes]).value);
+      await databaseSvc.updateItem("notes", note);
+      toast.info(`"${note.Title}" moved to "${folder.Name}"`, { position:"bottom-right", hideProgressBar:true, autoClose:2500 });
+    }
+  }
+
+  willFolderAcceptNote = (draggable:JQuery, folder:IFolder)=>{
+    const d = draggable[0];
+    const model:INote = d && d["model"] || null;
+    if(model && model.FolderID != folder.ID){
+      return true;
+    }
+    return false;
+  }
+
   render() {
     const { loading } = this.state;
     let strSearch = this.state.strSearch;
@@ -188,14 +207,17 @@ class NoteList extends Component<Props,State> {
         <div className="list-of-notes">
           {
             foldersWithGeneral.map(folder=>(
-              <Folder key={folder.ID} checkedNotes={this.state.checkedNotes} 
-                    onCheckNote={this.onNoteListCheck} 
-                    onClickAddNote={this.onClickAddNote}
-                    onClickDeleteNotes={this.onClickDeleteNotes}
-                    onClickDeleteFolder={this.onClickDeleteFolder}
-                    onUpdateFolder={this.onUpdateFolder}
-                    folder={folder}>
-              </Folder>)
+              <Droppable className="droppable-folder" key={folder.ID} model={folder}  onJqDrop={this.onDropToFolder} accept={e=>this.willFolderAcceptNote(e,folder)} >
+                <Folder checkedNotes={this.state.checkedNotes} 
+                      onCheckNote={this.onNoteListCheck} 
+                      onClickAddNote={this.onClickAddNote}
+                      onClickDeleteNotes={this.onClickDeleteNotes}
+                      onClickDeleteFolder={this.onClickDeleteFolder}
+                      onUpdateFolder={this.onUpdateFolder}
+                      folder={folder}>
+                </Folder>
+              </Droppable>
+              )
             )
           }
         </div>

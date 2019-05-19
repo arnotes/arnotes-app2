@@ -13,6 +13,7 @@ import { ReduxAction } from '../redux/redux-action.class';
 import { ActionTypes } from '../redux/action-types';
 import { TextDialog } from './TextDialog';
 import { useConfirmDialog } from '../hooks/useConfirmDialog';
+import { Draggable } from './Draggable';
 
 export interface IAppProps {
   strSearch?:string;
@@ -85,7 +86,7 @@ function Folder (props: IAppProps) {
     },[folder]);
 
     return (
-      <div>
+      
         <ExpansionPanel expanded={expanded} onChange={()=>setExpanded(!expanded)}>
           <ExpansionPanelSummary expandIcon={<i className="fas fa-angle-down"></i>}>
             <Badge color={notes.length? "primary":"error"} showZero badgeContent={notes.length}>
@@ -96,22 +97,23 @@ function Folder (props: IAppProps) {
             <List classes={({root:'note-list'})} dense disablePadding style={({width:"100%"})}>
             {
               notes.map((n,index)=>(
-              <ListItem  classes={({root:'note-list-item'})} divider={index+1 < notes.length} 
-                        dense
-                        key={n.ID} 
-                        button 
-                        selected={n.ID==(selectedNote && selectedNote.ID || "")}
-                        onClick={()=>props.dispatch(new ReduxAction(ActionTypes.SET_SELECTED_NOTE,n).value)} >
-                <Checkbox style={({padding:"0px"})} 
-                    onClick={e=>e.stopPropagation()} 
-                    onChange={(e,checked)=>handleNoteCheckChange(n,checked)} 
-                    checked={checkedNotes.includes(n)}>
-                </Checkbox>
-                <ListItemText primary={n.Title}/>
-                <ListItemIcon classes={({root:'note-list-item-icon'})}>
-                  <i className="fas fa-arrows-alt"></i>
-                </ListItemIcon>
-              </ListItem>    
+              <Draggable key={n.ID} className="draggable-note-liste-item" model={n} >
+                <ListItem  classes={({root:'note-list-item'})} divider={index+1 < notes.length} 
+                          dense
+                          button 
+                          selected={n.ID==(selectedNote && selectedNote.ID || "")}
+                          onClick={()=>props.dispatch(new ReduxAction(ActionTypes.SET_SELECTED_NOTE,n).value)} >
+                  <Checkbox style={({padding:"0px"})} 
+                      onClick={e=>e.stopPropagation()} 
+                      onChange={(e,checked)=>handleNoteCheckChange(n,checked)} 
+                      checked={checkedNotes.includes(n)}>
+                  </Checkbox>
+                  <ListItemText primary={n.Title}/>
+                  <ListItemIcon classes={({root:'note-list-item-icon'})} onClick={e=>e.stopPropagation()}>
+                    <i className="fas fa-arrows-alt"></i>
+                  </ListItemIcon>
+                </ListItem>    
+              </Draggable>
               ))
             }
             </List>
@@ -163,7 +165,7 @@ function Folder (props: IAppProps) {
           <TextDialog title="Rename Folder" label="Folder Name" setShow={fn=>showTextDialog=fn}></TextDialog>
           {confirmDialog}
         </ExpansionPanel>
-      </div>
+      
     );
 }
 

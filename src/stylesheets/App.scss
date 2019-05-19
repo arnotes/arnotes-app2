@@ -186,10 +186,18 @@ div.drawer-paper{
 }
 
 .note-list{
+    span.ui-draggable-dragging{
+        .note-list-item{
+            &{
+                z-index: 10;
+                background-color: #555555;
+            }
+        }        
+    }
     .note-list-item{
         &:not(:hover){//reserver for drag and drop
             .note-list-item-icon{
-                display: none;
+                //display: none;
             }
         }
         .note-list-item-icon{
@@ -198,5 +206,11 @@ div.drawer-paper{
                 pointer-events: none;
             }
         }
+    }
+}
+
+.droppable-folder{
+    &.ui-droppable-hover{
+        filter: contrast(50%);
     }
 }
