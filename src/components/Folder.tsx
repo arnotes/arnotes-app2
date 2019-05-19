@@ -93,10 +93,10 @@ function Folder (props: IAppProps) {
             </Badge>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails style={({paddingLeft:"5px",paddingRight:"5px"})}>
-            <List dense disablePadding style={({width:"100%"})}>
+            <List classes={({root:'note-list'})} dense disablePadding style={({width:"100%"})}>
             {
               notes.map((n,index)=>(
-              <ListItem divider={index+1 < notes.length} 
+              <ListItem  classes={({root:'note-list-item'})} divider={index+1 < notes.length} 
                         dense
                         key={n.ID} 
                         button 
@@ -108,6 +108,9 @@ function Folder (props: IAppProps) {
                     checked={checkedNotes.includes(n)}>
                 </Checkbox>
                 <ListItemText primary={n.Title}/>
+                <ListItemIcon classes={({root:'note-list-item-icon'})}>
+                  <i className="fas fa-arrows-alt"></i>
+                </ListItemIcon>
               </ListItem>    
               ))
             }
@@ -137,10 +140,16 @@ function Folder (props: IAppProps) {
             }        
             {
             checkedNotes.length &&
-            <MenuItem onClick={handleDeleteNotes}>
-              <i style={({color:"#F44336"})} className="fas fa-file"></i>
-              &nbsp; Delete Notes
-            </MenuItem>
+            <React.Fragment>
+              <MenuItem>
+                <i className="fas fa-exchange-alt"></i>
+                &nbsp; Move Notes
+              </MenuItem>            
+              <MenuItem onClick={handleDeleteNotes}>
+                <i style={({color:"#F44336"})} className="fas fa-file"></i>
+                &nbsp; Delete Notes
+              </MenuItem>
+            </React.Fragment>
             }
             {
             folder.ID!=null &&

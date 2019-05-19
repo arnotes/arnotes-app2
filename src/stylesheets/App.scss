@@ -184,3 +184,19 @@ div.drawer-paper{
 .ql-snow .ql-picker.ql-expanded .ql-picker-label {
     color: $semi-black !important;
 }
+
+.note-list{
+    .note-list-item{
+        &:not(:hover){//reserver for drag and drop
+            .note-list-item-icon{
+                display: none;
+            }
+        }
+        .note-list-item-icon{
+            cursor: grab;
+            & *{
+                pointer-events: none;
+            }
+        }
+    }
+}

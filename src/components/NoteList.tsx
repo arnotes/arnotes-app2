@@ -11,7 +11,6 @@ import { ActionTypes } from '../redux/action-types';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import * as ReactDOM from 'react-dom';
-import Dragula from 'react-dragula';
 import { ToastContainer, toast } from 'react-toastify';
 import Folder from './Folder';
 import { IFolder } from '../models/folder.interface';
