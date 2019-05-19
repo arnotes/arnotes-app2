@@ -141,8 +141,13 @@ class NoteList extends Component<Props,State> {
     }
   }
 
-  onNoteListReorder(notes:INote[]){
-    databaseSvc.updateMany("notes", notes);
+  onUpdateFolder = async (folder:IFolder)=>{
+    const ix = this.props.folders.findIndex(f => f.ID==folder.ID);
+    if(ix+1){
+      this.props.folders[ix] = folder;
+      this.props.dispatch(new ReduxAction(ActionTypes.SET_FOLDER_LIST,[...this.props.folders]).value);
+      await databaseSvc.updateItem("folders",folder);
+    }
   }
 
   render() {
@@ -189,6 +194,7 @@ class NoteList extends Component<Props,State> {
                     onClickAddNote={this.onClickAddNote}
                     onClickDeleteNotes={this.onClickDeleteNotes}
                     onClickDeleteFolder={this.onClickDeleteFolder}
+                    onUpdateFolder={this.onUpdateFolder}
                     folder={folder}>
               </Folder>)
             )

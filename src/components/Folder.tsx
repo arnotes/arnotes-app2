@@ -11,6 +11,7 @@ import Typography from '@material-ui/core/Typography';
 import { Badge, ListItem, List, ListItemText, Checkbox, ListItemIcon, Fab, IconButton, Icon, ExpansionPanelActions, Button, MenuItem, Menu } from '@material-ui/core';
 import { ReduxAction } from '../redux/redux-action.class';
 import { ActionTypes } from '../redux/action-types';
+import { TextDialog } from './TextDialog';
 
 export interface IAppProps {
   strSearch?:string;
@@ -22,6 +23,7 @@ export interface IAppProps {
   onClickAddNote?:(folderID:string)=>any;
   onClickDeleteNotes?:()=>any;
   onClickDeleteFolder?:(folder:IFolder)=>any;
+  onUpdateFolder?:(folder:IFolder)=>any;
   checkedNotes:INote[];
 }
 
@@ -36,7 +38,8 @@ function Folder (props: IAppProps) {
 
     const selectedNote = props.selectedNote;
     const checkedNotes = props.checkedNotes||[];
-    
+    let showTextDialog:(val:string)=>Promise<string> = null;
+
     const handleNoteCheckChange = React.useCallback((note:INote,checked:boolean)=>{
       props.onCheckNote && props.onCheckNote(note,checked);
     },[]);
@@ -64,7 +67,15 @@ function Folder (props: IAppProps) {
     const handleDeleteFolder = React.useCallback(()=>{
       props.onClickDeleteFolder && props.onClickDeleteFolder(props.folder);
       handleMenuClose();
-    },[]);    
+    },[]);
+
+    const handleRename = React.useCallback(async ()=>{
+      handleMenuClose();
+      const response = await showTextDialog(folder.Name);
+      if(response != null){
+        props.onUpdateFolder && props.onUpdateFolder({...folder,Name:response});
+      }
+    },[]);        
 
     return (
       <ExpansionPanel expanded={expanded} onChange={()=>setExpanded(!expanded)}>
@@ -105,6 +116,13 @@ function Folder (props: IAppProps) {
           open={Boolean(menuAnchor)}
           onClose={handleMenuClose}
         >
+          {
+          folder.ID!=null &&
+          <MenuItem onClick={handleRename}>
+            <i className="fas fa-pen"></i>
+            &nbsp; Rename
+          </MenuItem>
+          }        
           <MenuItem onClick={handleAddNote}>
             <i className="fas fa-file-medical"></i>
             &nbsp; Add Note
@@ -123,7 +141,9 @@ function Folder (props: IAppProps) {
             &nbsp; Delete Folder
           </MenuItem>
           }
-        </Menu>        
+        </Menu>
+
+        <TextDialog title="Rename Folder" label="Folder Name" setShow={fn=>showTextDialog=fn}></TextDialog>
       </ExpansionPanel>
     );
 }
