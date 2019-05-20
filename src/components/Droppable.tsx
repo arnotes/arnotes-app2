@@ -18,7 +18,6 @@ export function Droppable (props: IDroppableProps) {
     React.useEffect(()=>{
       ref && ref.current && $(ref.current).droppable({
         accept: props.accept,
-        tolerance: "pointer",
         drop:(event, ui)=>{
           const draggable = ui.draggable[0];
           const droppable = event.target as HTMLElement;
