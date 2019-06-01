@@ -5,4 +5,5 @@ export interface INote{
     Body: string;
     Index?: number;
     FolderID?: string;
+    IsReadOnly?: boolean;
 }

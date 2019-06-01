@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import ReactQuill from 'react-quill';
 import { StoreState } from '../redux/store-state';
-import { Paper, TextField, Typography, Button, IconButton, Hidden, CircularProgress, Icon } from '@material-ui/core';
+import { Paper, TextField, Typography, Button, IconButton, Hidden, CircularProgress, Icon, FormControlLabel, Switch } from '@material-ui/core';
 import { Subject } from 'rxjs';
 import { IReduxAction, ReduxAction } from '../redux/redux-action.class';
 import { ActionTypes } from '../redux/action-types';
@@ -22,6 +22,7 @@ interface State{
   loading?:boolean;
   title?:string;
   body?:string;
+  readonly?: boolean;
 }
 
 class NoteEditor extends Component<Props, State> {
@@ -31,7 +32,7 @@ class NoteEditor extends Component<Props, State> {
     this.state = {};
   }
 
-  sbjChange = new Subject<{title:string,body:string}>();
+  sbjChange = new Subject<{title:string,body:string,readonly:boolean}>();
 
   currentNoteID:string = null;
 
@@ -68,7 +69,7 @@ class NoteEditor extends Component<Props, State> {
   onTitleChange(title:string){
     const note = this.props.selectedNote;
     note.Title = title;
-    this.sbjChange.next({title:this.state.title, body:this.state.body});
+    this.sbjChange.next({title:this.state.title, body:this.state.body, readonly:this.state.readonly});
     this.setState({...this.state,loading:true,title:title});
   }
 
@@ -79,13 +80,20 @@ class NoteEditor extends Component<Props, State> {
 
     const note = this.props.selectedNote;
     note.Body = body;
-    this.sbjChange.next({title:this.state.title, body:this.state.body});
+    this.sbjChange.next({title:this.state.title, body:this.state.body, readonly:this.state.readonly});
     this.setState({...this.state,loading:true,body:body});
+  }
+
+  onReadOnlyChange(isReadOnlyChecked:boolean){
+    const note = this.props.selectedNote;
+    note.IsReadOnly = isReadOnlyChecked;
+    this.sbjChange.next({title:this.state.title, body:this.state.body, readonly:this.state.readonly });
+    this.setState({...this.state,loading:true,readonly:isReadOnlyChecked});
   }
 
   render() {
     const { selectedNote } = this.props;
-    let { title,body } = this.state;
+    let { title,body,readonly } = this.state;
     if(title==null){
       title = selectedNote && selectedNote.Title || "";
     }    
@@ -93,6 +101,10 @@ class NoteEditor extends Component<Props, State> {
     if(body==null){
       body = selectedNote && selectedNote.Body || "";
     }    
+
+    if(readonly==null){
+      readonly = selectedNote && selectedNote.IsReadOnly || false;
+    }
 
     return (
       <div className={"note-editor-component"}>
@@ -121,9 +133,16 @@ class NoteEditor extends Component<Props, State> {
         </Paper>
         <Paper classes={({root:"quill-paper-wrapper "+(!selectedNote && "hidden")})} square >
           <ReactQuill onChange={(e,delta,source)=>this.onBodyChange(e,delta,source)} 
-            readOnly={!selectedNote} 
+            readOnly={!selectedNote || readonly} 
             value={body} 
             placeholder="write your notes :)" theme="snow" />
+
+          <FormControlLabel
+            style={({position:"absolute",right:"0px",bottom:"0px"})}
+            control={
+              <Switch checked={readonly} onChange={(e,checked)=>this.onReadOnlyChange(checked)} />
+            }
+            label="Read-only"/>            
         </Paper>
       </div>
     )

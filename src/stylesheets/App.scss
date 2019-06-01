@@ -144,6 +144,7 @@ div.drawer-paper{
         }
     }
     .quill-paper-wrapper{
+        position: relative;
         margin-top: 10px;
         .delete-btn{
             transform: translate3d(0px, -51px, 0px);
