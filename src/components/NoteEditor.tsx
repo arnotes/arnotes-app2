@@ -50,7 +50,7 @@ class NoteEditor extends Component<Props, State> {
     const prop = a as Props;
     const upcomingNoteID = prop.selectedNote && prop.selectedNote.ID || null;
     if(this.currentNoteID != upcomingNoteID){
-      this.setState({...this.state,title:null,body:null});
+      this.setState({...this.state,title:null,body:null,readonly:null});
     }
     this.currentNoteID = prop.selectedNote && prop.selectedNote.ID || null;
   }
