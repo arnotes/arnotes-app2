@@ -26,7 +26,7 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "package.json" }}ci
+            - v1-dependencies-{{ checksum "package.json" }}
 
       - run: npm install
 
@@ -47,13 +47,13 @@ jobs:
           rm -rf ./arnotes.github.io/service-worker.js &&
           rm -rf ./arnotes.github.io/asset-manifest.json &&
           npm run build &&
-          cp -R build/* ./arnotes.github.io/  &&
+          cp -R build/* ./arnotes.github.io/
       
       - run : |
-          git config --global user.name "${gituser}"
-          cd arnotes.github.io
+          git config --global user.name "${gituser}" &&
+          cd arnotes.github.io &&
           git add . &&
-          git commit -m "CircleCI Deploy - $(date)"
+          git commit -m "CircleCI Deploy - $(date)" &&
           git push       
 
         
