@@ -16,6 +16,10 @@ jobs:
 
     working_directory: ~/repo
 
+    branches:
+      only:
+        - master
+
     steps:
       - checkout
 
@@ -32,6 +36,21 @@ jobs:
           key: v1-dependencies-{{ checksum "package.json" }}
       
       - run: |
-          rm -rf arnotes.github.io
-          git pull "https://arnotes:mapzmdlagn1@github.com/<github_account>/<repository_name>.git" master
+          rm -rf arnotes.github.io &&
+          git clone "https://${gituser}:${gitpass}@github.com/arnotes/arnotes.github.io.git" arnotes.github.io &&
+          rm -rf ./arnotes.github.io/static &&
+          rm -rf ./arnotes.github.io/bootstrap.css &&
+          rm -rf ./arnotes.github.io/favicon.ico &&
+          rm -rf ./arnotes.github.io/index.html &&
+          rm -rf ./arnotes.github.io/manifest.json &&
+          rm -rf ./arnotes.github.io/precache-manifest.*.js &&
+          rm -rf ./arnotes.github.io/service-worker.js &&
+          rm -rf ./arnotes.github.io/asset-manifest.json &&
+          npm run build &&
+          cp -R build/* ./arnotes.github.io/  &&
+          cd arnotes.github.io && 
+          git add . &&
+          git commit -m "CircleCI Deploy - $(date)" &&
+          git push
+
         
