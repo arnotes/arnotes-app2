@@ -50,8 +50,8 @@ jobs:
           cp -R build/* ./arnotes.github.io/
       
       - run : |
-          git config user.email "${gitemail}" &&
-          git config user.name "${gituser}" &&
+          git config --global user.email user.email "${gitemail}" &&
+          git config --global user.name user.name "${gituser}" &&
           cd arnotes.github.io &&
           git add . &&
           git commit -m "CircleCI Deploy - $(date)" &&
