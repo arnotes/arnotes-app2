@@ -36,7 +36,7 @@ class App extends Component<AppProps> {
   render() {
     return (
       <MuiThemeProvider theme={theme}>
-          <input type="text" hidden value="testdeploy"/>
+          <input type="text" hidden value="testdeploy2"/>
           <CssBaseline/>
           <AuthProtector></AuthProtector>
           <ToastContainer />
