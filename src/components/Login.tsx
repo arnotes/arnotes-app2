@@ -61,7 +61,7 @@ const mapStateToProps = (state:StoreState):LoginProps => ({
   user:state.user
 })
 
-const mapDispatchToProps = (dispatch:Dispatch<any>):LoginProps => {
+const mapDispatchToProps = (dispatch:any):LoginProps => {
   return {
     dispatch:dispatch
   }
