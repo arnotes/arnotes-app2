@@ -59,17 +59,16 @@ function Folder (props: IAppProps) {
       setMenuAnchor(null);
     },[]);
 
-    const handleExpandChange = React.useCallback(()=>{
+    const handleExpandChange = React.useCallback((event: React.ChangeEvent<{}>,open:boolean)=>{
       const openFolders = {...(props.openFolders || {})};
-      const expanded = props.openFolders && props.openFolders[props.folder.ID];
-      openFolders[props.folder.ID] = !expanded;
+      openFolders[folder.ID] = open;
       const action = new ReduxAction(
         ActionTypes.SET_OPEN_FOLDERS,
         openFolders
       );
 
       props.dispatch(action.value);
-    },[]);
+    },[folder.ID,props.openFolders]);
 
     const handleAddNote = React.useCallback(()=>{
       props.onClickAddNote && props.onClickAddNote(folder.ID);
