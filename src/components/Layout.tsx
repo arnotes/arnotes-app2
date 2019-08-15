@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Toolbar, IconButton, Typography, Button, AppBar, Hidden, withWidth, Drawer, Grid, Tooltip } from '@material-ui/core';
+import { Toolbar, IconButton, Typography, AppBar, Hidden, withWidth, Tooltip, SwipeableDrawer } from '@material-ui/core';
 import { Dispatch } from 'redux';
 import { StoreState } from '../redux/store-state';
 import { IReduxAction, ReduxAction } from '../redux/redux-action.class';
@@ -55,9 +55,14 @@ class Layout extends Component<LayoutProps, LayoutState> {
     return (
       <div className={`layout-component ${(this.state.drawerOpen || !this.isMobile()) && "drawer-open"}`}>
         <nav>
-          <Drawer anchor="left" variant={this.isMobile()? "temporary":"permanent"} onClose={()=>this.toggleDrawer(false)} open={this.state.drawerOpen} classes={({paper:"drawer-paper"})} >
+          <SwipeableDrawer anchor="left" 
+            variant={this.isMobile()? "temporary":"permanent"} 
+            onOpen={()=>this.toggleDrawer(true)}
+            onClose={()=>this.toggleDrawer(false)} 
+            open={this.state.drawerOpen} 
+            classes={({paper:"drawer-paper"})} >
             <NoteList onSelectNote={this.onSelectNote} ></NoteList>
-          </Drawer>
+          </SwipeableDrawer>
         </nav>      
         <AppBar color="primary" position="relative">
           <Toolbar>

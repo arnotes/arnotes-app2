@@ -14,6 +14,7 @@ import { ActionTypes } from '../redux/action-types';
 import { TextDialog } from './TextDialog';
 import { useConfirmDialog } from '../hooks/useConfirmDialog';
 import { Draggable } from './Draggable';
+import { IDictionary } from '../models/dictionary.interface';
 
 export interface IAppProps {
   strSearch?:string;
@@ -27,10 +28,10 @@ export interface IAppProps {
   onClickDeleteFolder?:(folder:IFolder)=>any;
   onUpdateFolder?:(folder:IFolder)=>any;
   checkedNotes:INote[];
+  openFolders?:IDictionary<boolean>;
 }
 
 function Folder (props: IAppProps) {
-    const [expanded,setExpanded] = React.useState(false);
     const [menuAnchor,setMenuAnchor] = React.useState(null);
     const regex = new RegExp(props.strSearch||"","ig");
     const folder = props.folder;
@@ -56,6 +57,18 @@ function Folder (props: IAppProps) {
 
     const handleMenuClose = React.useCallback(()=>{
       setMenuAnchor(null);
+    },[]);
+
+    const handleExpandChange = React.useCallback(()=>{
+      const openFolders = {...(props.openFolders || {})};
+      const expanded = props.openFolders && props.openFolders[props.folder.ID];
+      openFolders[props.folder.ID] = !expanded;
+      const action = new ReduxAction(
+        ActionTypes.SET_OPEN_FOLDERS,
+        openFolders
+      );
+
+      props.dispatch(action.value);
     },[]);
 
     const handleAddNote = React.useCallback(()=>{
@@ -87,7 +100,7 @@ function Folder (props: IAppProps) {
 
     return (
       
-        <ExpansionPanel expanded={expanded} onChange={()=>setExpanded(!expanded)}>
+        <ExpansionPanel expanded={props.openFolders && props.openFolders[props.folder.ID]} onChange={handleExpandChange}>
           <ExpansionPanelSummary expandIcon={<i className="fas fa-angle-down"></i>}>
             <Badge color={notes.length? "primary":"error"} showZero badgeContent={notes.length}>
               <Typography>{folder.Name}</Typography>
@@ -173,7 +186,8 @@ function Folder (props: IAppProps) {
 const mapState:mapStateFn<any> = (state)=>({
   notes:state.notes,
   strSearch: state.strSearch,
-  selectedNote: state.selectedNote
+  selectedNote: state.selectedNote,
+  openFolders: state.openFolders
 });
 
 const mapDispatch:mapDispatchFn = (d)=>({

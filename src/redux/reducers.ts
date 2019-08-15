@@ -4,6 +4,7 @@ import { combineReducers } from "redux";
 import { INote } from "../models/note.interface";
 import { StoreState } from "./store-state";
 import { IFolder } from "../models/folder.interface";
+import { IDictionary } from "../models/dictionary.interface";
 
 function user(userState:firebase.User, action:IReduxAction<firebase.User>) {
   switch (action.type) {
@@ -83,11 +84,24 @@ function selectedNote(note:INote, action:IReduxAction<INote>){
   }
 }
 
+function openFolders(openFolders:IDictionary<boolean>, action:IReduxAction<IDictionary<boolean>>){
+  switch (action.type) {
+    case ActionTypes.SET_OPEN_FOLDERS:
+      return {...action.data};
+      break;
+  
+    default:
+      return openFolders || {};
+      break;
+  }
+}
+
 export const combinedReducers = combineReducers({
   user,
   notes:notes,
   folders,
   strSearch:strSearch,
   filteredNotes:filteredNotes,
-  selectedNote:selectedNote
+  selectedNote:selectedNote,
+  openFolders
 });
