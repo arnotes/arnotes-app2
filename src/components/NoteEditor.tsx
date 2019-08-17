@@ -125,13 +125,13 @@ class NoteEditor extends Component<Props, State> {
               classes={({root:'txt-title'})} 
               disabled={!selectedNote} 
               value={title}></TextField>
-            <IconButton disabled={!selectedNote} onClick={this.onCloseNote} color="default">
-              <i style={({fontSize:'20px'})} className="fas fa-times-circle"></i>
-            </IconButton>
             <CircularProgress color="secondary" className={"editor-save-progress "+(!this.state.loading && "hidden")} />
           </div>
         </Paper>
         <Paper classes={({root:"quill-paper-wrapper "+(!selectedNote && "hidden")})} square >
+          <IconButton style={({position:'absolute',right:'3px'})} disableRipple disabled={!selectedNote} onClick={this.onCloseNote} color="default">
+            <i style={({fontSize:'20px',color:'#444'})} className="fas fa-times"></i>
+          </IconButton>          
           <ReactQuill onChange={(e,delta,source)=>this.onBodyChange(e,delta,source)} 
             readOnly={!selectedNote || readonly} 
             value={body} 
