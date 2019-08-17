@@ -146,6 +146,19 @@ div.drawer-paper{
     .quill-paper-wrapper{
         position: relative;
         margin-top: 10px;
+        .bottom-toolbar{
+            text-align: right;
+            position: absolute;
+            height: 30px;
+            width: 100%;
+            bottom: 15px;  
+            .btn-copy{
+                background-color:  transparent !important;
+                i{
+                    color: $secondary-color;
+                }
+            }          
+        }
         .delete-btn{
             transform: translate3d(0px, -51px, 0px);
             right: 20px;

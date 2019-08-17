@@ -1,4 +1,4 @@
-import React, { Component, Dispatch } from 'react'
+import React, { Component, Dispatch, createRef } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import ReactQuill from 'react-quill';
@@ -12,6 +12,7 @@ import { async } from 'q';
 import { databaseSvc } from '../services/database.service';
 import { debounceTime } from 'rxjs/operators';
 import { Delta, Sources } from 'quill';
+import { toast } from 'react-toastify';
 
 interface Props extends StoreState{
   dispatch?:<T>(action:IReduxAction<T>)=>any;
@@ -33,6 +34,7 @@ class NoteEditor extends Component<Props, State> {
   }
 
   sbjChange = new Subject<{title:string,body:string,readonly:boolean}>();
+  quillRef = createRef<ReactQuill>();
 
   currentNoteID:string = null;
 
@@ -91,6 +93,18 @@ class NoteEditor extends Component<Props, State> {
     this.setState({...this.state,loading:true,readonly:isReadOnlyChecked});
   }
 
+  copyClipboard = () => {
+    const text =this.quillRef.current.getEditor().getText();
+    var copyhelper = document.createElement("input");
+    copyhelper.className = 'copyhelper'
+    document.body.appendChild(copyhelper);
+    copyhelper.value = text;
+    copyhelper.select();
+    document.execCommand("copy");
+    document.body.removeChild(copyhelper);    
+    toast.info(`"${this.props.selectedNote.Title}" copied to clipboard.`, { position:"bottom-right", hideProgressBar:true, autoClose:2500 });
+  }
+
   render() {
     const { selectedNote } = this.props;
     let { title,body,readonly } = this.state;
@@ -133,16 +147,21 @@ class NoteEditor extends Component<Props, State> {
             <i style={({fontSize:'20px',color:'#444'})} className="fas fa-times"></i>
           </IconButton>          
           <ReactQuill onChange={(e,delta,source)=>this.onBodyChange(e,delta,source)} 
+            ref={this.quillRef}
             readOnly={!selectedNote || readonly} 
             value={body} 
             placeholder="write your notes :)" theme="snow" />
 
-          <FormControlLabel
-            style={({position:"absolute",right:"0px",bottom:"0px"})}
-            control={
-              <Switch checked={readonly} onChange={(e,checked)=>this.onReadOnlyChange(checked)} />
-            }
-            label="Read-only"/>            
+          <div className="bottom-toolbar">
+            <IconButton onClick={this.copyClipboard} className="btn-copy" disableRipple>
+              <i className="fas fa-clipboard"></i>
+            </IconButton>            
+            <FormControlLabel
+              control={
+                <Switch checked={readonly} onChange={(e,checked)=>this.onReadOnlyChange(checked)} />
+              }
+              label="Read-only"/>            
+          </div>
         </Paper>
       </div>
     )
