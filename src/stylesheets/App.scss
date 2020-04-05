@@ -17,6 +17,8 @@ $danger-color-dark: #932020;
 $secondary-color: #00e5ff;//#eeff41;
 $secondary-text-color: rgba(0, 0, 0, 0.87);
 $semi-black: #4c4646;
+$bg-light-black: #424242;
+$bg-dark-black: #303030;
 
 .hidden{
     display: none !important;
@@ -134,8 +136,8 @@ div.drawer-paper{
             width: 40px;
             height: 40px;
             position: absolute;
-            right: 70px;
-            pointer-events: none;            
+            right: 30px;
+            pointer-events: none;
         }
         display: flex;
         padding: 10px;
@@ -144,6 +146,25 @@ div.drawer-paper{
         }
     }
     .quill-paper-wrapper{
+        .tox-tinymce{
+            border: none;
+            .tox-edit-area{
+                border: none;
+            }
+            .tox-edit-area__iframe{
+                html{
+                    body{
+                        background-color: $bg-dark-black;
+                    }
+                }
+            }
+            .tox-toolbar__primary{
+                background-color: $bg-light-black;
+            }
+            .tox-statusbar{
+                background-color: $bg-light-black;
+            }
+        }
         position: relative;
         margin-top: 10px;
         .bottom-toolbar{
