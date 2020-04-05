@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 export interface IDroppableProps {
-  children:React.ReactNode;
+  children:any;
   className?:string;
   model?:any;
   onJqDrop?:(item:any,container:any)=>any;
