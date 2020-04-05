@@ -81,6 +81,9 @@ class NoteEditor extends Component<Props, State> {
     // }
     //const text = ev.level.content;
     const note = this.props.selectedNote;
+    if(!note){
+      return;
+    }
     note.Body = text;
     this.sbjChange.next({title:this.state.title, body:this.state.body, readonly:this.state.readonly});
     this.setState({...this.state,loading:true,body:text});
