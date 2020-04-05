@@ -75,12 +75,11 @@ class NoteEditor extends Component<Props, State> {
     this.setState({...this.state,loading:true,title:title});
   }
 
-  onBodyChange = (a:any, b:any, c:any) => {
-    console.log({a,b,c});
+  onBodyChange = (text:string) => {
     // if(source!="user"){
     //   return;
     // }
-    const text = b.getContent();
+    //const text = ev.level.content;
     const note = this.props.selectedNote;
     note.Body = text;
     this.sbjChange.next({title:this.state.title, body:this.state.body, readonly:this.state.readonly});
@@ -169,7 +168,7 @@ class NoteEditor extends Component<Props, State> {
             }}
             disabled={!selectedNote || readonly}
             value={body}
-            onKeyUp={this.onBodyChange as any}
+            onEditorChange={this.onBodyChange as any}
           />            
 
           <div className="bottom-toolbar">
