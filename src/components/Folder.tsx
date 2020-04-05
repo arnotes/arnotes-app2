@@ -17,6 +17,7 @@ import { Draggable } from './Draggable';
 import { IDictionary } from '../models/dictionary.interface';
 
 export interface IAppProps {
+  children?:any;
   strSearch?:string;
   dispatch?:dispatchFn;
   notes?:INote[];
