@@ -75,11 +75,12 @@ class NoteEditor extends Component<Props, State> {
     this.setState({...this.state,loading:true,title:title});
   }
 
-  onBodyChange = (text:string) => {
+  onBodyChange = (a:any, b:any, c:any) => {
+    console.log({a,b,c});
     // if(source!="user"){
     //   return;
     // }
-    //const text = ev.level.content;
+    const text = b.getContent();
     const note = this.props.selectedNote;
     note.Body = text;
     this.sbjChange.next({title:this.state.title, body:this.state.body, readonly:this.state.readonly});
@@ -152,8 +153,8 @@ class NoteEditor extends Component<Props, State> {
             apiKey="g8p3uw4cm5xtob3gmhm918uozx96r78pql9tian9u9rzr1ip"
             init={{
               paste_data_images : true,
-              skin: "oxide-dark",
-              content_css: "dark",
+              skin: "/skins/ui/CUSTOM/skin.css",
+              content_css: "/skins/ui/CUSTOM/content.css",
               height: 666,
               menubar: false,
               plugins: [
@@ -168,7 +169,7 @@ class NoteEditor extends Component<Props, State> {
             }}
             disabled={!selectedNote || readonly}
             value={body}
-            onEditorChange={this.onBodyChange}
+            onKeyUp={this.onBodyChange as any}
           />            
 
           <div className="bottom-toolbar">
