@@ -84,6 +84,10 @@ class NoteEditor extends Component<Props, State> {
     if(!note){
       return;
     }
+    if(note.Body == text){
+      return;
+    }
+    
     note.Body = text;
     this.sbjChange.next({title:this.state.title, body:this.state.body, readonly:this.state.readonly});
     this.setState({...this.state,loading:true,body:text});
