@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import '../stylesheets/App.scss';
-import 'react-quill/dist/quill.snow.css';
-import 'react-quill/dist/quill.core.css';
+// import 'react-quill/dist/quill.snow.css';
+// import 'react-quill/dist/quill.core.css';
+
 import 'react-toastify/dist/ReactToastify.css';
 import '@material-ui/core'
 import firebase from 'firebase';
@@ -36,7 +37,6 @@ class App extends Component<AppProps> {
   render() {
     return (
       <MuiThemeProvider theme={theme}>
-          <input type="text" hidden value="DeployedWithCircleCI"/>
           <CssBaseline/>
           <AuthProtector></AuthProtector>
           <ToastContainer />

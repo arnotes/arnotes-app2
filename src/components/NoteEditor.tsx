@@ -1,7 +1,7 @@
 import React, { Component, Dispatch, createRef } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import ReactQuill from 'react-quill';
+import { Editor } from '@tinymce/tinymce-react';
 import { StoreState } from '../redux/store-state';
 import { Paper, TextField, Typography, Button, IconButton, Hidden, CircularProgress, Icon, FormControlLabel, Switch } from '@material-ui/core';
 import { Subject } from 'rxjs';
@@ -11,7 +11,7 @@ import { INote } from '../models/note.interface';
 import { async } from 'q';
 import { databaseSvc } from '../services/database.service';
 import { debounceTime } from 'rxjs/operators';
-import { Delta, Sources } from 'quill';
+
 import { toast } from 'react-toastify';
 
 interface Props extends StoreState{
@@ -34,7 +34,7 @@ class NoteEditor extends Component<Props, State> {
   }
 
   sbjChange = new Subject<{title:string,body:string,readonly:boolean}>();
-  quillRef = createRef<ReactQuill>();
+  //quillRef = createRef<ReactQuill>();
 
   currentNoteID:string = null;
 
@@ -75,15 +75,15 @@ class NoteEditor extends Component<Props, State> {
     this.setState({...this.state,loading:true,title:title});
   }
 
-  onBodyChange(body:string,delta:Delta,source:Sources){
-    if(source!="user"){
-      return;
-    }
-
+  onBodyChange = (text:string) => {
+    // if(source!="user"){
+    //   return;
+    // }
+    //const text = ev.level.content;
     const note = this.props.selectedNote;
-    note.Body = body;
+    note.Body = text;
     this.sbjChange.next({title:this.state.title, body:this.state.body, readonly:this.state.readonly});
-    this.setState({...this.state,loading:true,body:body});
+    this.setState({...this.state,loading:true,body:text});
   }
 
   onReadOnlyChange(isReadOnlyChecked:boolean){
@@ -94,11 +94,11 @@ class NoteEditor extends Component<Props, State> {
   }
 
   copyClipboard = () => {
-    const text =this.quillRef.current.getEditor().getText();
+    //const text =this.quillRef.current.getEditor().getText();
     var copyhelper = document.createElement("input");
     copyhelper.className = 'copyhelper'
     document.body.appendChild(copyhelper);
-    copyhelper.value = text;
+    //copyhelper.value = text;
     copyhelper.select();
     document.execCommand("copy");
     document.body.removeChild(copyhelper);    
@@ -142,20 +142,39 @@ class NoteEditor extends Component<Props, State> {
             <CircularProgress color="secondary" className={"editor-save-progress "+(!this.state.loading && "hidden")} />
           </div>
         </Paper>
-        <Paper classes={({root:"quill-paper-wrapper "+(!selectedNote && "hidden")})} square >
-          <IconButton style={({position:'absolute',right:'3px'})} disableRipple disabled={!selectedNote} onClick={this.onCloseNote} color="default">
-            <i style={({fontSize:'20px',color:'#444'})} className="fas fa-times"></i>
-          </IconButton>          
-          <ReactQuill onChange={(e,delta,source)=>this.onBodyChange(e,delta,source)} 
+        <Paper classes={({root:"quill-paper-wrapper "+(!selectedNote && "hidden")})} square >      
+          {/* <ReactQuill onChange={(e,delta,source)=>this.onBodyChange(e,delta,source)} 
             ref={this.quillRef}
             readOnly={!selectedNote || readonly} 
             value={body} 
-            placeholder="write your notes :)" theme="snow" />
+            placeholder="write your notes :)" theme="snow" /> */}
+          <Editor
+            apiKey="g8p3uw4cm5xtob3gmhm918uozx96r78pql9tian9u9rzr1ip"
+            init={{
+              paste_data_images : true,
+              skin: "oxide-dark",
+              content_css: "dark",
+              height: 666,
+              menubar: false,
+              plugins: [
+                'advlist autolink lists link image charmap print preview anchor',
+                'searchreplace visualblocks code fullscreen',
+                'insertdatetime media table paste code help wordcount'
+              ],
+              toolbar:
+                'undo redo | formatselect | bold italic backcolor | \
+                alignleft aligncenter alignright alignjustify | \
+                bullist numlist outdent indent | removeformat | help'
+            }}
+            disabled={!selectedNote || readonly}
+            value={body}
+            onEditorChange={this.onBodyChange}
+          />            
 
           <div className="bottom-toolbar">
-            <IconButton onClick={this.copyClipboard} className="btn-copy" disableRipple>
+            {/* <IconButton onClick={this.copyClipboard} className="btn-copy" disableRipple>
               <i className="fas fa-clipboard"></i>
-            </IconButton>            
+            </IconButton>             */}
             <FormControlLabel
               control={
                 <Switch checked={readonly} onChange={(e,checked)=>this.onReadOnlyChange(checked)} />
